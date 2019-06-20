@@ -105,3 +105,4 @@ venv.bak/
 
 # Django-generated files
 migrations/
+static/
