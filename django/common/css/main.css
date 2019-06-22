@@ -2,6 +2,20 @@
   background-color: #363636
 }
 
+html,
+body {
+  height: 100%;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+}
+
+#content-wrap {
+  flex: 1 0 auto;
+}
+
 #search-box {
   border-top-right-radius: 0;
   border-bottom-right-radius: 0;
@@ -14,6 +28,7 @@
 }
 
 .footer {
+  flex-shrink: 0;
   color: white;
   padding: 0.5em 1.7em;
 }
@@ -26,10 +41,6 @@
 
 .footer a:hover {
   color: #D4D4D4
-}
-
-#wawawa {
-  height: 70.8vh;
 }
 
 .footer-list-item {
@@ -59,4 +70,19 @@
 
 #f-right-side li:last-child {
   margin-right: 0;
+}
+
+.options {
+  display: flex;
+  justify-content: flex-start;
+}
+
+.options button {
+  margin: 1em 1em 0 0;
+}
+
+@media only screen and (max-width: 600px) {
+  #content-footer {
+    flex-direction: column;
+  }
 }

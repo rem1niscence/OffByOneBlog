@@ -72,9 +72,15 @@ class Question(Publishable):
 
     objects = QuestionManager()
 
+    def __str__(self):
+        return f'{self.user} | {self.title}'
+
 
 class Tag(models.Model):
     name = models.CharField(max_length=40)
+
+    def __str__(self):
+        return self.name
 
 
 class Answer(Publishable):
