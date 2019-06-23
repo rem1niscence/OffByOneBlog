@@ -1,6 +1,6 @@
 from django import forms
 from django.contrib.auth import get_user_model
-from qanda.models import Question, QuestionVote
+from qanda.models import Question, QuestionVote, Answer, AnswerVote
 
 
 class QuestionForm(forms.ModelForm):
@@ -77,3 +77,48 @@ class QuestionVoteForm(forms.ModelForm):
     class Meta:
         model = QuestionVote
         fields = ('user', 'question', 'value')
+
+
+class AnswerForm(forms.ModelForm):
+    user = forms.ModelChoiceField(
+        widget=forms.HiddenInput,
+        queryset=get_user_model().objects.all(),
+        disabled=True
+    )
+
+    question = forms.ModelChoiceField(
+        widget=forms.HiddenInput,
+        queryset=Question.objects.all(),
+        disabled=True
+    )
+
+    class Meta:
+        model = Answer
+        fields = ('user', 'question', 'body')
+        widgets = {
+            'body': forms.Textarea(attrs={
+                'class': 'textarea', 'name': 'answer-body', 'rows': 4}), }
+
+
+class AnswerVoteForm(forms.ModelForm):
+    user = forms.ModelChoiceField(
+        widget=forms.HiddenInput,
+        queryset=get_user_model().objects.all(),
+        disabled=True
+    )
+
+    answer = forms.ModelChoiceField(
+        widget=forms.HiddenInput,
+        queryset=Answer.objects.all(),
+        disabled=True
+    )
+
+    value = forms.ChoiceField(
+        label='Vote',
+        widget=forms.RadioSelect,
+        choices=AnswerVote.VALUE_CHOICES
+    )
+
+    class Meta:
+        model = AnswerVote
+        fields = ('user', 'answer', 'value')

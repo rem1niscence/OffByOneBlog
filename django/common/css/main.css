@@ -86,3 +86,11 @@ body {
     flex-direction: column;
   }
 }
+
+hr {
+  background-color: #d2d2d2;
+}
+
+#accepted {
+  background-color: hsl(0, 0%, 86%);
+}

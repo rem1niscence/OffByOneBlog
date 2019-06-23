@@ -1,8 +1,8 @@
-from django.contrib.auth import get_user_model as User
 from django.db import models
+from django.contrib.auth import get_user_model as User
+from django.utils import timezone
 from django.db.models.aggregates import Sum
 from django.db.models.functions import Coalesce
-from django.utils import timezone
 
 
 class VoteManager(models.Manager):
@@ -30,9 +30,9 @@ class QuestionManager(models.Manager):
 
 
 class AnswerManager(models.Manager):
-    def all_with_related_model_and_score(self):
-        qs = self.get_queryset()
-        qs = qs.annotate(score=Sum('answervote__value'))
+    def all_with_score(self):
+        qs = self.get_queryset() \
+            .annotate(score=Coalesce(Sum('answervote__value'), 0))
         return qs
 
 
@@ -57,8 +57,8 @@ class Votable(models.Model):
     UP = 1
     DOWN = -1
     VALUE_CHOICES = (
-        (UP, 'Up'),
-        (DOWN, 'Down')
+        (UP, '👍'),
+        (DOWN, '👎')
     )
     value = models.SmallIntegerField(choices=VALUE_CHOICES)
     user = models.ForeignKey(User(), on_delete=models.CASCADE)
@@ -91,6 +91,9 @@ class Answer(Publishable):
     accepted = models.BooleanField(default=False)
 
     objects = AnswerManager()
+
+    class Meta:
+        ordering = ["-accepted", ]
 
 
 class Comment(Publishable):
