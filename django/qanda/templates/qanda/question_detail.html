@@ -1,0 +1,50 @@
+{% extends 'core/base.html' %}
+{% load markup_tags %}
+
+{% block title %} {{ question.title }} {% endblock title %}
+
+{% block body %}
+
+<div class="section">
+
+  <div class="container">
+    {% comment %} <div class="content"> {% endcomment %}
+        <p class="title">{{ question.title }}</p>
+        <hr style="background-color: #d2d2d2">
+      <div class="columns is-fullheight">
+        <div class="column is-1">
+          <p class="has-text-centered  is-size-4">{{ question.score }}</p>
+          {% if vote_form %}
+          <form method="post" action="{{ vote_form_url }}">
+            {% csrf_token %}
+            {{ vote_form.as_p }}
+            <input type="submit" class="button is-link" value="Vote">
+          </form>
+          {% endif %}
+        </div>
+        <div class="column is-8">
+          {{ question.body|apply_markup:"markdown" | linebreaks}}
+        </div>
+
+        <div class="column is-3">
+          <article class="message">
+            <div class="message-header">
+              <p>Placeholder temporal sidebar</p>
+              <button class="delete" aria-label="delete"></button>
+            </div>
+            <div class="message-body">
+              Lorem ipsum dolor sit amet, consectetur adipiscing elit. <strong>Pellentesque risus mi</strong>, tempus
+              quis placerat ut, porta nec nulla. Vestibulum rhoncus ac ex sit amet fringilla. Nullam gravida purus diam,
+              et dictum <a>felis venenatis</a> efficitur. Aenean ac <em>eleifend lacus</em>, in mollis lectus. Donec
+              sodales, arcu et sollicitudin porttitor, tortor urna tempor ligula, id porttitor mi magna a neque. Donec
+              dui urna, vehicula et sem eget, facilisis sodales sem.
+            </div>
+          </article>
+        </div>
+      </div>
+      {% comment %} </div> {% endcomment %}
+  </div>
+
+</div>
+
+{% endblock body %}

@@ -1,6 +1,6 @@
 from django import forms
-from qanda.models import Question
 from django.contrib.auth import get_user_model
+from qanda.models import Question, QuestionVote
 
 
 class QuestionForm(forms.ModelForm):
@@ -19,7 +19,7 @@ class QuestionForm(forms.ModelForm):
 
     class Meta:
         model = Question
-        fields = ['title', 'body', 'user']
+        fields = ('title', 'body', 'user')
         widgets = {
             'body': forms.Textarea(attrs={
                 'class': 'textarea',
@@ -34,11 +34,10 @@ class QuestionForm(forms.ModelForm):
         if not valid:
             return valid
 
-        # Clean tags input
         tags = self.cleaned_data['custom_tags'].split(',')
-        tags = list(map(lambda x: x.strip(), tags))
         if len(tags) >= MIN_TAGS and len(tags) < MAX_TAGS:
-            # Save them as lowercase
+            # Clean tags input
+            tags = list(map(lambda x: x.strip(), tags))
             self.custom_tags = list(map(lambda x: x.lower(), tags))
             return valid
         else:
@@ -54,3 +53,27 @@ class QuestionForm(forms.ModelForm):
                 {'class': self.fields[field].widget.attrs.get('class', '') +
                  f' {self.error_css_class}'})
         return valid
+
+
+class QuestionVoteForm(forms.ModelForm):
+    user = forms.ModelChoiceField(
+        widget=forms.HiddenInput,
+        queryset=get_user_model().objects.all(),
+        disabled=True
+    )
+
+    question = forms.ModelChoiceField(
+        widget=forms.HiddenInput,
+        queryset=Question.objects.all(),
+        disabled=True
+    )
+
+    value = forms.ChoiceField(
+        label='Vote',
+        widget=forms.RadioSelect,
+        choices=QuestionVote.VALUE_CHOICES
+    )
+
+    class Meta:
+        model = QuestionVote
+        fields = ('user', 'question', 'value')

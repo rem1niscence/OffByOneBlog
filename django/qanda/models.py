@@ -1,7 +1,8 @@
-from django.db import models
 from django.contrib.auth import get_user_model as User
-from django.utils import timezone
+from django.db import models
 from django.db.models.aggregates import Sum
+from django.db.models.functions import Coalesce
+from django.utils import timezone
 
 
 class VoteManager(models.Manager):
@@ -19,9 +20,12 @@ class VoteManager(models.Manager):
 
 
 class QuestionManager(models.Manager):
+    def all_with_prefetch_tags(self):
+        return self.get_queryset().prefetch_related('tags')
+
     def all_with_related_model_and_score(self):
-        qs = self.get_queryset()
-        qs = qs.annotate(score=Sum('questionvote__value'))
+        qs = self.all_with_prefetch_tags()
+        qs = qs.annotate(score=Coalesce(Sum('questionvote__value'), 0))
         return qs
 
 
@@ -35,7 +39,6 @@ class AnswerManager(models.Manager):
 class Publishable(models.Model):
     user = models.ForeignKey(User(), on_delete=models.CASCADE)
     body = models.TextField()
-    votes = models.IntegerField(default=0)
     created = models.DateTimeField(editable=False)
     modified = models.DateTimeField()
 
@@ -85,7 +88,7 @@ class Tag(models.Model):
 
 class Answer(Publishable):
     question = models.ForeignKey('Question', on_delete=models.CASCADE)
-    answered = models.BooleanField(default=False)
+    accepted = models.BooleanField(default=False)
 
     objects = AnswerManager()
 
@@ -96,7 +99,6 @@ class Comment(Publishable):
 
 class QuestionVote(Votable):
     question = models.ForeignKey('Question', on_delete=models.CASCADE)
-
     objects = VoteManager('question')
 
     class Meta:
