@@ -3,7 +3,7 @@ from django.http import HttpResponseBadRequest
 from django.shortcuts import redirect, reverse
 from django.views.generic import CreateView, DetailView, UpdateView
 from qanda.forms import (AnswerForm, AnswerVoteForm, QuestionForm,
-                         QuestionVoteForm)
+                         QuestionVoteForm, AnswerAcceptanceForm)
 from qanda.models import Answer, AnswerVote, Question, QuestionVote, Tag
 
 
@@ -59,8 +59,24 @@ class QuestionDetail(DetailView):
         return {'instance': vote, 'url': vote_form_url}
 
     def get_context_data(self, **kwargs):
+        self.object.viewed += 1
+        self.object.save()
         ctx = super(QuestionDetail, self).get_context_data(**kwargs)
         ctx['answers'] = []
+        answers = Answer.objects.all_with_score() \
+            .filter(question=self.object.id)
+
+        for ans in answers:
+            answer_dict = {}
+            answer_dict['info'] = ans
+            ctx['answers'].append(answer_dict)
+
+        if self.object.can_accept_answers(self.request.user):
+            ctx['accept_form'] = \
+                AnswerAcceptanceForm(initial={'accepted': True})
+            ctx['reject_form'] = \
+                AnswerAcceptanceForm(initial={'accepted': False})
+
         if self.request.user.is_authenticated:
             vote_data = self.get_vote_data(
                 QuestionVote, self.object, 'question_id',
@@ -70,9 +86,7 @@ class QuestionDetail(DetailView):
             ctx['vote_form'] = vote_form
             ctx['vote_form_url'] = vote_data['url']
 
-            answers = Answer.objects.all_with_score() \
-                .filter(question=self.object.id)
-
+            i = 0
             for ans in answers:
                 answer_dict = {}
                 ans_vote_data = self.get_vote_data(
@@ -82,12 +96,13 @@ class QuestionDetail(DetailView):
                 answer_dict['vote_form'] = AnswerVoteForm(
                     instance=ans_vote_data['instance'])
                 answer_dict['vote_url'] = ans_vote_data['url']
-                answer_dict['info'] = ans
-                ctx['answers'].append(answer_dict)
+                ctx['answers'][i].update(answer_dict)
+                i += 1
 
             ctx['answer_form'] = AnswerForm()
             ctx['answer_form_url'] = reverse('qanda:answer-create', kwargs={
                 'question_id': self.object.id})
+
         return ctx
 
 
@@ -154,10 +169,7 @@ class AnswerVoteCreate(CreateView):
         }
 
     def get_success_url(self):
-        return reverse('qanda:question-detail', kwargs={
-            'pk': self.object.answer.question.id, 'title':
-            self.object.answer.question.title
-        })
+        return self.object.answer.question.get_absolute_url()
 
     def render_to_response(self, context, **response_kwargs):
         return redirect(to=self.get_success_url())
@@ -174,10 +186,15 @@ class AnswerVoteUpdate(UpdateView):
         return vote
 
     def get_success_url(self):
-        return reverse('qanda:question-detail', kwargs={
-            'pk': self.object.answer.question.id, 'title':
-            self.object.answer.question.title
-        })
+        return self.object.answer.question.get_absolute_url()
 
     def render_to_response(self, context, **response_kwargs):
         return redirect(to=self.get_success_url())
+
+
+class UpdateAnswerAcceptanceView(UpdateView):
+    form_class = AnswerAcceptanceForm
+    queryset = Answer.objects.all()
+
+    def get_success_url(self):
+        return self.object.question.get_absolute_url()

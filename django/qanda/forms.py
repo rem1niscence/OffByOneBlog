@@ -122,3 +122,14 @@ class AnswerVoteForm(forms.ModelForm):
     class Meta:
         model = AnswerVote
         fields = ('user', 'answer', 'value')
+
+
+class AnswerAcceptanceForm(forms.ModelForm):
+    accepted = forms.BooleanField(
+        widget=forms.HiddenInput,
+        required=False
+    )
+
+    class Meta:
+        model = Answer
+        fields = ('accepted', )

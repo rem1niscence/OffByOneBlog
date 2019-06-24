@@ -3,6 +3,7 @@ from django.contrib.auth import get_user_model as User
 from django.utils import timezone
 from django.db.models.aggregates import Sum
 from django.db.models.functions import Coalesce
+from django.shortcuts import reverse
 
 
 class VoteManager(models.Manager):
@@ -78,6 +79,13 @@ class Question(Publishable):
     def __str__(self):
         return f'{self.user} | {self.title}'
 
+    def get_absolute_url(self):
+        return reverse('qanda:question-detail', kwargs={
+            'pk': self.pk, 'title': self.title.replace(' ', '-')})
+
+    def can_accept_answers(self, user):
+        return self.user == user
+
 
 class Tag(models.Model):
     name = models.CharField(max_length=40)
@@ -91,6 +99,19 @@ class Answer(Publishable):
     accepted = models.BooleanField(default=False)
 
     objects = AnswerManager()
+
+    def save(self, *args, **kwargs):
+        # There can only be one accepted answer per question
+        if self.accepted:
+            try:
+                tmp = Answer.objects.get(
+                    question=self.question.id, accepted=True)
+                if self != tmp:
+                    tmp.accepted = False
+                    tmp.save()
+            except Answer.DoesNotExist:
+                pass
+        super(Answer, self).save(*args, **kwargs)
 
     class Meta:
         ordering = ["-accepted", ]

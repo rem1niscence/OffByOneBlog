@@ -16,4 +16,6 @@ urlpatterns = [
          views.AnswerVoteCreate.as_view(), name='answer-vote-create'),
     path('answer/<int:answer_id>/vote/<int:pk>/',
          views.AnswerVoteUpdate.as_view(), name='answer-vote-update'),
+    path('answer/<int:pk>/', views.UpdateAnswerAcceptanceView.as_view(),
+         name='update-accepted-answer')
 ]
