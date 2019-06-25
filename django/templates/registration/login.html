@@ -1,6 +1,50 @@
-<h2>Login</h2>
-<form method="post">
-  {% csrf_token %}
-  {{ form.as_p }}
-  <button type="submit">Login</button>
-</form>
+{% extends 'core/base.html' %}
+
+{% block title %} Log In | {{block.super}} {% endblock title %}
+
+{% block body %}
+
+<div class="section">
+  <div class="container">
+    <div class="columns is-centered">
+      <div class="column is-half">
+        {% if 'next' in request.GET %}
+        <article class="message is-dark">
+          <div class="message-body">
+            You need to be logged in to access this feature
+          </div>
+        </article>
+        {% endif %}
+        <p class="title has-text-centered is-size-5">OffByOne</p>
+        <div class="login-box">
+          <form action="" method="post">
+            {% csrf_token %}
+            {% for error in form.non_field_errors %}
+            <p class="has-text-danger">{{error}}</p>
+            <br>
+            {% endfor %}
+            <p class="subtitle">Username</p>
+            {{form.username}}
+            <br><br>
+            <p class="subtitle">Password</p>
+            {{form.password}}
+            <br>
+            <p class="has-text-link has-text-right">
+              <a href="#">Forgot password?</a>
+            </p>
+            <label class="checkbox">
+              <input type="checkbox"> Remember me
+            </label>
+            <br><br>
+            <input type="submit" value="Log In" class="button is-link" style="margin-bottom: 1em">
+          </form>
+        </div>
+        <hr id="login-separator">
+        <p class="has-text-centered">Don't have an account? <a class="is-link" href="{% url 'register' %}">Sign up
+            here</a></p>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock body %}

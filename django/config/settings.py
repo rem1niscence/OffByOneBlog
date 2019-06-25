@@ -130,3 +130,9 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'common'),
 ]
+
+LOGIN_URL = 'login'
+
+# TODO: Create views to redirect fields below
+# LOGIN_REDIRECT_URL = ''
+# LOGOUT_REDIRECT_URL = ''

@@ -1,0 +1,14 @@
+{% if user.is_authenticated %}
+<form action="{{ answer_form_url }}" method="post">
+  {% csrf_token %}
+  <h2 class="title is-size-4" id="answer">Your Answer</h2>
+  {{ answer_form.body }}
+  <p><strong>Tip: </strong>You can use markdown here.</p>
+  <div class="options">
+    <button type="submit" name="action" value="SAVE" class="button is-link">Answer</button>
+  </div>
+</form>
+{% else %}
+<p class="has-text-centered">You need to be logged in to post an answer. You can log in <a href="#"
+    class="has-text-link">Here</a>.</p>
+{% endif %}

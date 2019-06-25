@@ -94,3 +94,28 @@ hr {
 #accepted {
   background-color: hsl(0, 0%, 86%);
 }
+
+.login-box {
+  max-width: 450px;
+  margin: 0 auto;
+  /* background-color: red; */
+  border: 2px solid gray;
+  padding: 10px;
+  padding-top: 30px;
+  border-radius: 5px;
+}
+
+.login-box .subtitle {
+  margin-bottom: 0.5em;
+}
+
+.login-box .button {
+  margin-left: 40%;
+}
+
+#login-separator {
+  max-width: 450px;
+  margin: 0 auto;
+  margin-top: 1.5em;
+  margin-bottom: 1em;
+}

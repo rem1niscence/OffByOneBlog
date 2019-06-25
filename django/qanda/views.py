@@ -2,12 +2,14 @@ from django.core.exceptions import PermissionDenied
 from django.http import HttpResponseBadRequest
 from django.shortcuts import redirect, reverse
 from django.views.generic import CreateView, DetailView, UpdateView
-from qanda.forms import (AnswerForm, AnswerVoteForm, QuestionForm,
+from qanda.forms import (AnswerForm, AnswerVoteForm,
+                         QuestionForm, CustomUserCreationForm,
                          QuestionVoteForm, AnswerAcceptanceForm)
 from qanda.models import Answer, AnswerVote, Question, QuestionVote, Tag
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 
-class CreateQuestion(CreateView):
+class CreateQuestion(LoginRequiredMixin, CreateView):
     template_name = 'qanda/ask_question.html'
     form_class = QuestionForm
 
@@ -106,7 +108,7 @@ class QuestionDetail(DetailView):
         return ctx
 
 
-class QuestionVoteCreate(CreateView):
+class QuestionVoteCreate(LoginRequiredMixin, CreateView):
     form_class = QuestionVoteForm
 
     def get_initial(self):
@@ -124,7 +126,7 @@ class QuestionVoteCreate(CreateView):
         return redirect(to=self.get_success_url())
 
 
-class QuestionVoteUpdate(UpdateView):
+class QuestionVoteUpdate(LoginRequiredMixin, UpdateView):
     form_class = QuestionVoteForm
     queryset = QuestionVote.objects.all()
 
@@ -143,7 +145,7 @@ class QuestionVoteUpdate(UpdateView):
         return redirect(to=self.get_success_url())
 
 
-class AnswerCreate(CreateView):
+class AnswerCreate(LoginRequiredMixin, CreateView):
     form_class = AnswerForm
 
     def get_initial(self):
@@ -159,7 +161,7 @@ class AnswerCreate(CreateView):
         })
 
 
-class AnswerVoteCreate(CreateView):
+class AnswerVoteCreate(LoginRequiredMixin, CreateView):
     form_class = AnswerVoteForm
 
     def get_initial(self):
@@ -175,7 +177,7 @@ class AnswerVoteCreate(CreateView):
         return redirect(to=self.get_success_url())
 
 
-class AnswerVoteUpdate(UpdateView):
+class AnswerVoteUpdate(LoginRequiredMixin, UpdateView):
     form_class = AnswerVoteForm
     queryset = AnswerVote.objects.all()
 
@@ -192,9 +194,14 @@ class AnswerVoteUpdate(UpdateView):
         return redirect(to=self.get_success_url())
 
 
-class UpdateAnswerAcceptanceView(UpdateView):
+class UpdateAnswerAcceptanceView(LoginRequiredMixin, UpdateView):
     form_class = AnswerAcceptanceForm
     queryset = Answer.objects.all()
 
     def get_success_url(self):
         return self.object.question.get_absolute_url()
+
+
+class SignUpView(CreateView):
+    form_class = CustomUserCreationForm
+    template_name = 'registration/register.html'

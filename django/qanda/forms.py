@@ -1,9 +1,27 @@
 from django import forms
-from django.contrib.auth import get_user_model
-from qanda.models import Question, QuestionVote, Answer, AnswerVote
+from django.contrib.auth import get_user_model, password_validation
+from django.contrib.auth.forms import (AuthenticationForm, UserCreationForm,
+                                       UsernameField)
+from django.utils.translation import gettext_lazy as _
+from qanda.models import Answer, AnswerVote, Question, QuestionVote
 
 
-class QuestionForm(forms.ModelForm):
+class ColorizedErrorFormMixin(forms.ModelForm):
+    error_css_class = 'is-danger'
+
+    def is_valid(self):
+        valid = super(ColorizedErrorFormMixin, self).is_valid()
+        self.add_error_css_class()
+        return valid
+
+    def add_error_css_class(self):
+        for field in self.errors:
+            self.fields[field].widget.attrs.update(
+                {'class': self.fields[field].widget.attrs.get('class', '') +
+                 f' {self.error_css_class}'})
+
+
+class QuestionForm(ColorizedErrorFormMixin, forms.ModelForm):
     error_css_class = 'is-danger'
     user = forms.ModelChoiceField(
         widget=forms.HiddenInput,
@@ -48,10 +66,7 @@ class QuestionForm(forms.ModelForm):
                     'custom_tags', 'You cannot add more than six tags')
             valid = False
 
-        for field in self.errors:
-            self.fields[field].widget.attrs.update(
-                {'class': self.fields[field].widget.attrs.get('class', '') +
-                 f' {self.error_css_class}'})
+        self.add_error_css_class()
         return valid
 
 
@@ -133,3 +148,46 @@ class AnswerAcceptanceForm(forms.ModelForm):
     class Meta:
         model = Answer
         fields = ('accepted', )
+
+
+class CustomAuhthenticationForm(AuthenticationForm):
+    username = UsernameField(
+        widget=forms.TextInput(attrs={'autofocus': True, 'class': 'input'}))
+    password = forms.CharField(
+        label=_("Password"),
+        strip=False,
+        widget=forms.PasswordInput(attrs={'class': 'input'}))
+
+
+class CustomUserCreationForm(ColorizedErrorFormMixin, UserCreationForm):
+    first_name = forms.CharField(
+        max_length=30, widget=forms.TextInput(attrs={"class": "input"}))
+
+    last_name = forms.CharField(
+        max_length=30, widget=forms.TextInput(attrs={"class": "input"}))
+
+    email = forms.EmailField(
+        max_length=254, widget=forms.TextInput(attrs={"class": "input"}))
+
+    username = UsernameField(
+        widget=forms.TextInput(attrs={'autofocus': True, 'class': 'input'}))
+
+    password1 = forms.CharField(
+        label=_("Password"),
+        strip=False,
+        widget=forms.PasswordInput(
+            attrs={"class": "input",
+                   "placeholder": "min 8 characters, alphanumeric"}),
+        help_text=password_validation.password_validators_help_text_html(),
+    )
+    password2 = forms.CharField(
+        label=_("Password confirmation"),
+        widget=forms.PasswordInput(attrs={"class": "input"}),
+        strip=False,
+        help_text=_("Enter the same password as before, for verification."),
+    )
+
+    class Meta:
+        model = get_user_model()
+        fields = ('first_name', 'last_name', 'email',
+                  'username', 'password1', 'password2')

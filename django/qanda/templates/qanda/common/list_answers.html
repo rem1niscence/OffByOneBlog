@@ -1,0 +1,41 @@
+{% load markup_tags %}
+
+{% for answer in answers %}
+        <div class="columns" id="{% if answer.info.accepted %}accepted{% endif %}">
+          <div class="column is-1">
+            <p class="has-text-centered">{{ answer.info.score }}</p>
+            {% if user.is_authenticated %}
+            <form method="post" action="{{ answer.vote_url }}">
+              {% csrf_token %}
+              {{ answer.vote_form.as_p }}
+              <input type="submit" class="button is-link" value="Vote">
+            </form>
+            {% endif %}
+          </div>
+          <div class="column is-11">
+            {{ answer.info.body|apply_markup:"markdown" | linebreaks}}
+            {% if answer.info.accepted and reject_form %}
+            <br>
+            <form method="post" action="{% url "qanda:update-accepted-answer" pk=answer.info.pk %}">
+              {% csrf_token %}
+              {{reject_form}}
+              <input class="button is-danger is-pulled-right" type="submit" value="Reject answer">
+            </form>
+            {% elif accept_form %}
+            <br>
+            <form method="post" action="{% url "qanda:update-accepted-answer" pk=answer.info.pk %}">
+              {% csrf_token %}
+              {{accept_form}}
+              <input class="button is-link is-pulled-right" type="submit" value="Accept answer">
+            </form>
+            {% endif %}
+            <br>
+            <br>
+            <div class="answer-data" style="margin-top: 0.5em">
+              <p class="has-text-right"><strong>Answered: </strong> {{ answer.info.created | timesince }} ago by
+                <strong>{{ answer.info.user }}</strong></p>
+            </div>
+          </div>
+        </div>
+        <hr>
+        {% endfor %}
