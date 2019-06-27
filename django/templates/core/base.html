@@ -17,7 +17,7 @@
   <div id="content-wrap">
     <nav class="navbar is-dark" role="navigation" aria-label="main navigation">
       <div class="navbar-brand">
-        <a class="navbar-item" href="#">
+        <a class="navbar-item" href="{% url 'qanda:home' %}">
           <img src="{% static 'assets/logo-text-white.svg' %}" width="125" height="35">
         </a>
 
@@ -49,7 +49,11 @@
       </div>
     </nav>
 
-    {% block body %}{% endblock body %}
+    <section class="section">
+      <div class="container">
+        {% block body %}{% endblock body %}
+      </div>
+    </section>
   </div>
   <footer class="footer" style="background-color: #363636">
     <div class="content" id="content-footer">

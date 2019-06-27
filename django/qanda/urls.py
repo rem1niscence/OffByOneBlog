@@ -3,6 +3,7 @@ from qanda import views
 
 app_name = 'qanda'
 urlpatterns = [
+    path('', views.HomePageView.as_view(), name='home'),
     path('ask/', views.CreateQuestion.as_view(), name='ask-question'),
     path('question/<int:question_id>/vote/',
          views.QuestionVoteCreate.as_view(), name='question-vote-create'),

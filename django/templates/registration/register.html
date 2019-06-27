@@ -4,66 +4,62 @@
 
 {% block body %}
 
-<div class="section">
-  <div class="container">
-    <div class="columns is-centered">
-      <div class="column is-half">
-        <p class="title has-text-centered is-size-5">OffByOne</p>
-        <div class="login-box">
-          <form action="" method="post">
-            {% csrf_token %}
-            {% for error in form.non_field_errors %}
+<div class="columns is-centered">
+  <div class="column is-half">
+    <p class="title has-text-centered is-size-5">OffByOne</p>
+    <div class="login-box">
+      <form action="" method="post">
+        {% csrf_token %}
+        {% for error in form.non_field_errors %}
+        <p class="has-text-danger">{{error}}</p>
+        <br>
+        {% endfor %}
+        <p class="subtitle">First Name</p>
+        {{form.first_name}}
+        <br><br>
+        <p class="subtitle">Last Name</p>
+        {{form.last_name}}
+        <br><br>
+        <p class="subtitle">Username</p>
+        {{form.username}}
+        {% if form.username.errors %}
+          {% for error in form.username.errors %}
             <p class="has-text-danger">{{error}}</p>
             <br>
-            {% endfor %}
-            <p class="subtitle">First Name</p>
-            {{form.first_name}}
-            <br><br>
-            <p class="subtitle">Last Name</p>
-            {{form.last_name}}
-            <br><br>
-            <p class="subtitle">Username</p>
-            {{form.username}}
-            {% if form.username.errors %}
-              {% for error in form.username.errors %}
-                <p class="has-text-danger">{{error}}</p>
-                <br>
-              {% endfor %}
-            {% else %}
-                <br>
-            {% endif %}
+          {% endfor %}
+        {% else %}
             <br>
-            <p class="subtitle">Email address</p>
-            {{form.email}}
-            {% if form.email.errors %}
-              {% for error in form.email.errors %}
-                <p class="has-text-danger">{{error}}</p>
-              {% endfor %}
-            {% else %}
-                <br>
-            {% endif %}
+        {% endif %}
+        <br>
+        <p class="subtitle">Email address</p>
+        {{form.email}}
+        {% if form.email.errors %}
+          {% for error in form.email.errors %}
+            <p class="has-text-danger">{{error}}</p>
+          {% endfor %}
+        {% else %}
             <br>
-            <p class="subtitle">Password</p>
-            {{form.password1}}
-            <br><br>
-            <p class="subtitle">Re-enter Password</p>
-            {{form.password2}}
-            {% if form.password2.errors %}
-              {% for error in form.password2.errors %}
-              <p class="has-text-danger">{{error}}</p>
-              {% endfor %}
-            {% else %}
-              <br>
-            {% endif %}
-            <br>
-            <input type="submit" value="Sign up" class="button is-link" style="margin-bottom: 1em">
-          </form>
-        </div>
-        <hr id="login-separator">
-        <p class="has-text-centered">Already have an account? <a class="is-link" href="{% url 'login' %}">Log in
-            here</a></p>
-      </div>
+        {% endif %}
+        <br>
+        <p class="subtitle">Password</p>
+        {{form.password1}}
+        <br><br>
+        <p class="subtitle">Re-enter Password</p>
+        {{form.password2}}
+        {% if form.password2.errors %}
+          {% for error in form.password2.errors %}
+          <p class="has-text-danger">{{error}}</p>
+          {% endfor %}
+        {% else %}
+          <br>
+        {% endif %}
+        <br>
+        <input type="submit" value="Sign up" class="button is-link" style="margin-bottom: 1em">
+      </form>
     </div>
+    <hr id="login-separator">
+    <p class="has-text-centered">Already have an account? <a class="is-link" href="{% url 'login' %}">Log in
+        here</a></p>
   </div>
 </div>
 

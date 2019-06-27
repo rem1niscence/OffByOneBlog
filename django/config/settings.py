@@ -134,5 +134,5 @@ STATICFILES_DIRS = [
 LOGIN_URL = 'login'
 
 # TODO: Create views to redirect fields below
-# LOGIN_REDIRECT_URL = ''
-# LOGOUT_REDIRECT_URL = ''
+LOGIN_REDIRECT_URL = 'qanda:home'
+LOGOUT_REDIRECT_URL = 'qanda:home'

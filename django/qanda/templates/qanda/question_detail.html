@@ -5,62 +5,53 @@
 
 {% block body %}
 
-<div class="section">
-
-  <div class="container">
-    <p class="title">{{ question.title }}</p>
+<p class="title">{{ question.title }}</p>
+<hr>
+<div class="columns">
+  <div class="column is-1">
+    <p class="has-text-centered  is-size-4">{{ question.score }}</p>
+    {% if vote_form %}
+    <form method="post" action="{{ vote_form_url }}">
+      {% csrf_token %}
+      {{ vote_form.as_p }}
+      <input type="submit" class="button is-link" value="Vote">
+    </form>
+    {% endif %}
+  </div>
+  <div class="column is-8 has-text-justified">
+    {{ question.body|apply_markup:"markdown" | linebreaks}}
+    <br>
+    {% for tag in question.tags.all %}
+    <span class="tag is-dark is-medium">{{tag}}</span>
+    {% endfor %}
+    <br><br>
+    <p class="is-size-4" style="margin-bottom: 0.3em">{{answers | length}} Answer{{answers|pluralize}}</p>
     <hr>
-    <div class="columns is-fullheight">
-      <div class="column is-1">
-        <p class="has-text-centered  is-size-4">{{ question.score }}</p>
-        {% if vote_form %}
-        <form method="post" action="{{ vote_form_url }}">
-          {% csrf_token %}
-          {{ vote_form.as_p }}
-          <input type="submit" class="button is-link" value="Vote">
-        </form>
-        {% endif %}
+
+    {% include "qanda/common/list_answers.html" %}
+
+    {% include "qanda/common/post_answer.html" %}
+
+  </div>
+
+  <div class="column is-3">
+    <p><strong>Asked: </strong>{{question.created | timesince}} ago</p>
+    <p><strong>Viewed: </strong>{{question.viewed}} time{{question.viewed|pluralize}}</p>
+    <p><strong>By: </strong>{{question.user}}</p>
+    <br>
+    <article class="message">
+      <div class="message-header">
+        <p>Placeholder temporal sidebar</p>
       </div>
-      <div class="column is-8 has-text-justified">
-        {{ question.body|apply_markup:"markdown" | linebreaks}}
-        <br>
-        {% for tag in question.tags.all %}
-        <span class="tag is-dark is-medium">{{tag}}</span>
-        {% endfor %}
-        <br><br>
-        <p class="is-size-4" style="margin-bottom: 0.3em">{{answers | length}} Answer{{answers|pluralize}}</p>
-        <hr>
-
-        {% include "qanda/common/list_answers.html" %}
-
-        {% include "qanda/common/post_answer.html" %}
-
+      <div class="message-body">
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit. <strong>Pellentesque risus mi</strong>, tempus
+        quis placerat ut, porta nec nulla. Vestibulum rhoncus ac ex sit amet fringilla. Nullam gravida purus diam,
+        et dictum <a>felis venenatis</a> efficitur. Aenean ac <em>eleifend lacus</em>, in mollis lectus. Donec
+        sodales, arcu et sollicitudin porttitor, tortor urna tempor ligula, id porttitor mi magna a neque. Donec
+        dui urna, vehicula et sem eget, facilisis sodales sem.
       </div>
-
-      <div class="column is-3">
-        <p><strong>Asked: </strong>{{question.created | timesince}} ago</p>
-        <p><strong>Viewed: </strong>{{question.viewed}} time{{question.viewed|pluralize}}</p>
-        <p><strong>By: </strong>{{question.user}}</p>
-        <br>
-        <article class="message">
-          <div class="message-header">
-            <p>Placeholder temporal sidebar</p>
-            <button class="delete" aria-label="delete"></button>
-          </div>
-          <div class="message-body">
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. <strong>Pellentesque risus mi</strong>, tempus
-            quis placerat ut, porta nec nulla. Vestibulum rhoncus ac ex sit amet fringilla. Nullam gravida purus diam,
-            et dictum <a>felis venenatis</a> efficitur. Aenean ac <em>eleifend lacus</em>, in mollis lectus. Donec
-            sodales, arcu et sollicitudin porttitor, tortor urna tempor ligula, id porttitor mi magna a neque. Donec
-            dui urna, vehicula et sem eget, facilisis sodales sem.
-          </div>
-        </article>
-      </div>
-    </div>
-    {% comment %}
-  </div> {% endcomment %}
-</div>
-
+    </article>
+  </div>
 </div>
 
 {% endblock body %}

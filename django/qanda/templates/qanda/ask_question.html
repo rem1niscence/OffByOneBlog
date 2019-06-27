@@ -4,49 +4,44 @@
 {% block title %}Ask your question{% endblock title %}
 
 {% block body %}
-<section class="section">
-  <div class="container">
-
-    {% if preview  %}
-    <div class="content">
-      <article class="message is-info">
-        <div class="message-header">
-          <p>Question preview</p>
-        </div>
-        <div class="message-body">
-          <h2>{{ preview.title }}</h2>
-          {{ preview.body|apply_markup:"markdown" }}
-       </div>
-      </article>
+{% if preview  %}
+<div class="content">
+  <article class="message is-info">
+    <div class="message-header">
+      <p>Question preview</p>
     </div>
-    {% endif %}
+    <div class="message-body">
+      <h2>{{ preview.title }}</h2>
+      {{ preview.body|apply_markup:"markdown" }}
+    </div>
+  </article>
+</div>
+{% endif %}
 
-    <h1 class="title">Ask your question</h2>
-      <p class="has-text-centered">Remember to abide by the community guidelines and try to make you question as clear
-        and informative as possible, you can use the markdown syntax to provide better and more specific formatting </p>
-      <hr>
+<h1 class="title">Ask your question</h2>
+  <p class="has-text-centered">Remember to abide by the community guidelines and try to make you question as clear
+    and informative as possible, you can use the markdown syntax to provide better and more specific formatting </p>
+  <hr>
 
-      <form method="post">
-        {% csrf_token %}
+<form method="post">
+  {% csrf_token %}
 
-        <h2 class="title">Title</h2>
-        {{ form.title }}
-        {% if form.title.errors %}
-        <p class="has-text-danger">{{form.title.errors}}</p>
-        {% endif %}
-        <h2 class="title" style="margin-top: 1.2em">Body</h2>
-        {{ form.body }}
-        <h2 class="title" style="margin-top: 1.2em">Tags (separated by commas)</h2>
-        {{ form.custom_tags }}
-        {% if form.custom_tags.errors %}
-        <div class="has-text-danger">{{form.custom_tags.errors}}</div>
-        {% endif %}
+  <h2 class="title">Title</h2>
+  {{ form.title }}
+  {% if form.title.errors %}
+  <p class="has-text-danger">{{form.title.errors}}</p>
+  {% endif %}
+  <h2 class="title" style="margin-top: 1.2em">Body</h2>
+  {{ form.body }}
+  <h2 class="title" style="margin-top: 1.2em">Tags (separated by commas)</h2>
+  {{ form.custom_tags }}
+  {% if form.custom_tags.errors %}
+  <div class="has-text-danger">{{form.custom_tags.errors}}</div>
+  {% endif %}
 
-        <div class="options">
-          <button type="submit" name="action" value="PREVIEW" class="button is-link">Preview</button>
-          <button type="submit" name="action" value="SAVE" class="button is-link">Publish</button>
-        </div>
-      </form>
+  <div class="options">
+    <button type="submit" name="action" value="PREVIEW" class="button is-link">Preview</button>
+    <button type="submit" name="action" value="SAVE" class="button is-link">Publish</button>
   </div>
-</section>
+</form>
 {% endblock body %}

@@ -1,0 +1,35 @@
+<div class="question">
+  {% for question in questions %}
+  <div class="columns" style="margin-bottom: 0;">
+    <div class=" column is-2">
+      <ul class="question-stats">
+        <li>
+          <p class="has-text-centered">{{question.score}}</p>
+          <p class="is-size-7">Votes</p>
+        </li>
+        <li>
+          <p class="has-text-centered">{{question.answer_set.all|length}}</p>
+          <p class="is-size-7">Answers</p>
+        </li>
+        <li>
+          <p class="has-text-centered">{{question.viewed}}</p>
+          <p class="is-size-7">Views</p>
+        </li>
+      </ul>
+    </div>
+    <div class="column is-10"  style="padding-bottom: 0">
+      <a href="{% url 'qanda:question-detail' pk=question.id title=question.title %}" class="question-title is-size-5 has-text-info">{{question.title}}</a>
+        
+     <div class="extra-info">
+      <div class="tags" style="margin-bottom: 0.5em">
+       {% for tag in question.tags.all %}
+        <span class="tag is-dark is-small">{{tag.name}}</span>
+        {% endfor %}
+      </div>
+        <p class="has-text-grey-light">Asked {{question.created|timesince}} ago by <strong>{{question.user}}</strong></p>
+     </div>
+    </div>
+  </div>
+  <hr style="height: 1px; margin-top: 0;">
+  {% endfor %}
+</div>

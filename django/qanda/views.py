@@ -1,12 +1,14 @@
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import PermissionDenied
 from django.http import HttpResponseBadRequest
-from django.shortcuts import redirect, reverse
-from django.views.generic import CreateView, DetailView, UpdateView
-from qanda.forms import (AnswerForm, AnswerVoteForm,
-                         QuestionForm, CustomUserCreationForm,
-                         QuestionVoteForm, AnswerAcceptanceForm)
+from django.shortcuts import redirect
+from django.urls import reverse, reverse_lazy
+from django.views.generic import (CreateView, DetailView, TemplateView,
+                                  UpdateView)
+from qanda.forms import (AnswerAcceptanceForm, AnswerForm, AnswerVoteForm,
+                         CustomUserCreationForm, QuestionForm,
+                         QuestionVoteForm)
 from qanda.models import Answer, AnswerVote, Question, QuestionVote, Tag
-from django.contrib.auth.mixins import LoginRequiredMixin
 
 
 class CreateQuestion(LoginRequiredMixin, CreateView):
@@ -45,7 +47,7 @@ class CreateQuestion(LoginRequiredMixin, CreateView):
 
 
 class QuestionDetail(DetailView):
-    queryset = Question.objects.all_with_related_model_and_score()
+    queryset = Question.objects.all_with_relations_and_score()
 
     def get_vote_data(self, model, obj, url_id, create_url, update_url):
         vote = model.objects.get_vote_or_unsaved_blank_vote(
@@ -118,9 +120,7 @@ class QuestionVoteCreate(LoginRequiredMixin, CreateView):
         }
 
     def get_success_url(self):
-        return reverse('qanda:question-detail', kwargs={
-            'pk': self.object.question.id, 'title': self.object.question.title
-        })
+        return self.object.question.get_absolute_url()
 
     def render_to_response(self, context, **response_kwargs):
         return redirect(to=self.get_success_url())
@@ -137,9 +137,7 @@ class QuestionVoteUpdate(LoginRequiredMixin, UpdateView):
         return vote
 
     def get_success_url(self):
-        return reverse('qanda:question-detail', kwargs={
-            'pk': self.object.question.id, 'title': self.object.question.title
-        })
+        return self.object.question.get_absolute_url()
 
     def render_to_response(self, context, **response_kwargs):
         return redirect(to=self.get_success_url())
@@ -155,10 +153,7 @@ class AnswerCreate(LoginRequiredMixin, CreateView):
         }
 
     def get_success_url(self):
-        return reverse('qanda:question-detail', kwargs={
-            'pk': self.kwargs['question_id'],
-            'title': self.object.question.title
-        })
+        return self.object.question.get_absolute_url()
 
 
 class AnswerVoteCreate(LoginRequiredMixin, CreateView):
@@ -202,6 +197,31 @@ class UpdateAnswerAcceptanceView(LoginRequiredMixin, UpdateView):
         return self.object.question.get_absolute_url()
 
 
+class HomePageView(TemplateView):
+    template_name = 'qanda/homepage.html'
+
+    def get_context_data(self, **kwargs):
+        ctx = super(HomePageView, self).get_context_data(**kwargs)
+
+        sort_by = self.request.GET.get('sort', None)
+        if (sort_by == 'newest'):
+            ctx["questions"] = \
+                Question.objects.all_with_relations_and_score()
+        elif (sort_by == 'answered'):
+            ctx["questions"] = \
+                Question.objects.all_with_answer_score() \
+                .order_by('-ans_score')
+        else:
+            ctx["questions"] = \
+                Question.objects.all_with_relations_and_score() \
+                .order_by("-score")
+
+        ctx['last_answers'] = Answer.objects.all_with_score() \
+            .order_by('-created')[:5]
+        return ctx
+
+
 class SignUpView(CreateView):
     form_class = CustomUserCreationForm
     template_name = 'registration/register.html'
+    success_url = reverse_lazy('qanda:homepage')

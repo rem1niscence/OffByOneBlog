@@ -1,0 +1,50 @@
+{% extends 'core/base.html' %}
+
+{% block title %}{{block.super}}{% endblock title %}
+
+{% block body %}
+<div class="top-bar">
+  <h1 class="title" style="margin-bottom: 0">Top Questions</h1>
+
+  <div class="tabs is-toggle">
+    <ul>
+      <li class="{% if not 'sort' in request.GET %} is-active {% endif %}">
+        <a href="{% url 'qanda:home' %}">
+          <span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Top&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+        </a>
+      </li>
+      <li class="{% if 'sort' in request.GET and request.GET.sort == 'newest'%} is-active {% endif %}">
+        <a href="{% url 'qanda:home' %}?sort=newest">
+          <span>Newest</span>
+        </a>
+      </li>
+      <li class="{% if 'sort' in request.GET and request.GET.sort == 'answered'%} is-active {% endif %}">
+        <a href="{% url 'qanda:home' %}?sort=answered">
+          <span>Answered</span>
+        </a>
+      </li>
+    </ul>
+  </div>
+</div>
+<hr>
+<div class="columns">
+  <div class="column is-9">
+    {% include "qanda/common/list_questions.html" %}
+  </div>
+  <div class="column is-3">
+    <article class="message">
+      <div class="message-header">
+        <p>Latest Answers</p>
+      </div>
+      <div class="message-body">
+        {% for answer in last_answers %}
+        <p class="is-size-6">{{answer.score}} <a class="has-text-info"
+            href="{% url 'qanda:question-detail' pk=answer.question.id title=answer.question.title %}">{{ answer.question.title }}</a>
+          by <strong class="is-size-7">{{answer.question.user}}</strong></p>
+        {% endfor %}
+      </div>
+    </article>
+  </div>
+</div>
+
+{% endblock body %}

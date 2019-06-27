@@ -24,9 +24,15 @@ class QuestionManager(models.Manager):
     def all_with_prefetch_tags(self):
         return self.get_queryset().prefetch_related('tags')
 
-    def all_with_related_model_and_score(self):
+    def all_with_relations_and_score(self):
         qs = self.all_with_prefetch_tags()
         qs = qs.annotate(score=Coalesce(Sum('questionvote__value'), 0))
+        return qs
+
+    def all_with_answer_score(self):
+        qs = self.all_with_relations_and_score()
+        qs = qs.annotate(ans_score=Coalesce(
+            Sum('answer__answervote__value'), 0))
         return qs
 
 
@@ -86,6 +92,9 @@ class Question(Publishable):
     def can_accept_answers(self, user):
         return self.user == user
 
+    class Meta:
+        ordering = ["-created", ]
+
 
 class Tag(models.Model):
     name = models.CharField(max_length=40)
@@ -115,6 +124,11 @@ class Answer(Publishable):
 
     class Meta:
         ordering = ["-accepted", ]
+
+    def get_absolute_url(self):
+        return reverse('qanda:question-detail', kwargs={
+            'pk': self.question.pk, 'title':
+            self.question.title.replace(' ', '-')})
 
 
 class Comment(Publishable):
