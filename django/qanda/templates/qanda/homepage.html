@@ -30,6 +30,36 @@
 <div class="columns">
   <div class="column is-9">
     {% include "qanda/common/list_questions.html" %}
+    {% if is_paginated %}
+    <nav class="pagination" role="navigation" aria-label="pagination">
+      {% if page_obj.has_previous %}
+      <a class="pagination-previous"
+        href="?page={{ page_obj.previous_page_number }}{% if request.GET.sort %}&sort={{request.GET.sort}}{% endif %}">Previous</a>
+      {% else %}
+      <a class="pagination-previous" disabled>Previous</a>
+      {% endif %}
+      {% if page_obj.has_next %}
+      <a class="pagination-next"
+        href="?page={{ page_obj.next_page_number }}{% if request.GET.sort %}&sort={{request.GET.sort}}{% endif %} ">Next
+        page</a>
+      {% else %}
+      <a class="pagination-previous" disabled>Next Page</a>
+      {% endif %}
+      <ul class="pagination-list">
+        {% for i in paginator.page_range %}
+        {% if page_obj.number == i %}
+        <a class="pagination-link is-current">{{i}}</a>
+        </li>
+        {% else %}
+        <li>
+          <a class="pagination-link"
+            href="?page={{ i }}{% if request.GET.sort %}&sort={{request.GET.sort}}{% endif %}">{{ i }}</a>
+        </li>
+        {% endif %}
+        {% endfor %}
+      </ul>
+    </nav>
+    {% endif %}
   </div>
   <div class="column is-3">
     <article class="message">
@@ -40,7 +70,8 @@
         {% for answer in last_answers %}
         <p class="is-size-6">{{answer.score}} <a class="has-text-info"
             href="{% url 'qanda:question-detail' pk=answer.question.id title=answer.question.title %}">{{ answer.question.title }}</a>
-          by <strong class="is-size-7">{{answer.question.user}}</strong></p>
+          <span class="is-size-7"> by </span><strong class="is-size-7">{{answer.question.user}}</strong></p>
+        <hr style="margin: 0.2em 0; height: 1px">
         {% endfor %}
       </div>
     </article>

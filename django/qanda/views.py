@@ -4,7 +4,7 @@ from django.http import HttpResponseBadRequest
 from django.shortcuts import redirect
 from django.urls import reverse, reverse_lazy
 from django.views.generic import (CreateView, DetailView, TemplateView,
-                                  UpdateView)
+                                  UpdateView, ListView)
 from qanda.forms import (AnswerAcceptanceForm, AnswerForm, AnswerVoteForm,
                          CustomUserCreationForm, QuestionForm,
                          QuestionVoteForm)
@@ -197,28 +197,28 @@ class UpdateAnswerAcceptanceView(LoginRequiredMixin, UpdateView):
         return self.object.question.get_absolute_url()
 
 
-class HomePageView(TemplateView):
+class HomePageView(ListView):
     template_name = 'qanda/homepage.html'
+    model = Question
+    paginate_by = 10
 
     def get_context_data(self, **kwargs):
         ctx = super(HomePageView, self).get_context_data(**kwargs)
-
-        sort_by = self.request.GET.get('sort', None)
-        if (sort_by == 'newest'):
-            ctx["questions"] = \
-                Question.objects.all_with_relations_and_score()
-        elif (sort_by == 'answered'):
-            ctx["questions"] = \
-                Question.objects.all_with_answer_score() \
-                .order_by('-ans_score')
-        else:
-            ctx["questions"] = \
-                Question.objects.all_with_relations_and_score() \
-                .order_by("-score")
-
         ctx['last_answers'] = Answer.objects.all_with_score() \
             .order_by('-created')[:5]
         return ctx
+
+    def get_queryset(self):
+        sort_by = self.request.GET.get('sort', None)
+        if (sort_by == 'newest'):
+            qs = Question.objects.all_with_relations_and_score()
+        elif (sort_by == 'answered'):
+            qs = Question.objects.all_with_answer_score() \
+                .order_by('-ans_score')
+        else:
+            qs = Question.objects.all_with_relations_and_score() \
+                .order_by("-score")
+        return qs
 
 
 class SignUpView(CreateView):
