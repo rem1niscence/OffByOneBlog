@@ -1,0 +1,13 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Account activation invalid URL | {{block.super}} {% endblock title %}
+
+{% block body %}
+<h1 class="title has-text-centered">Invalid confirmation link</h1>
+<p class="has-text-centered">The confirmation link was invalid, possibly because it has already been used.</p>
+
+<br>
+<div class="has-text-centered">
+  <a class="button is-link" href="{% url 'qanda:home' %}">Go home</a> 
+</div>
+{% endblock body %}

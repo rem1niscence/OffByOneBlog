@@ -20,6 +20,7 @@ django-markdownify = "*"
 django-markup = "*"
 markdown = "*"
 bleach-whitelist = "*"
+python-dotenv = "*"
 
 [requires]
 python_version = "3.6"
