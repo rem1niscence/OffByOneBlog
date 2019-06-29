@@ -13,7 +13,8 @@ from django.views.generic import CreateView, DetailView, ListView, UpdateView
 from qanda.forms import (AnswerAcceptanceForm, AnswerForm, AnswerVoteForm,
                          CustomUserCreationForm, QuestionForm,
                          QuestionVoteForm)
-from qanda.models import Answer, AnswerVote, Question, QuestionVote, Tag
+from qanda.models import (Answer, AnswerVote, Question,
+                          QuestionVote, Tag, Profile)
 from qanda.tokens import account_activation_token
 
 
@@ -212,6 +213,8 @@ class HomePageView(ListView):
         ctx = super(HomePageView, self).get_context_data(**kwargs)
         ctx['last_answers'] = Answer.objects.all_with_score() \
             .order_by('-created')[:5]
+        ctx['top_users'] = Profile.objects.get_all_and_user_score() \
+            .order_by('-score')[:5]
         return ctx
 
     def get_queryset(self):

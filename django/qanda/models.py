@@ -157,10 +157,21 @@ class AnswerVote(Votable):
         unique_together = ('user', 'answer')
 
 
+class ProfileManager(models.Manager):
+    # Score for an user is based on the sum of upvotes of all their answers.
+    def get_all_and_user_score(self):
+        qs = self.get_queryset()
+        qs = qs.annotate(score=Coalesce(
+            Sum('user__answer__answervote__value'), 0))
+        return qs
+
+
 class Profile(models.Model):
     user = models.OneToOneField(
         User(), on_delete=models.CASCADE, primary_key=True)
     email_confirmed = models.BooleanField(default=False)
+
+    objects = ProfileManager()
 
     def __str__(self):
         return f'{self.user}'

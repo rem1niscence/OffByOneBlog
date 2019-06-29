@@ -75,6 +75,10 @@
         {% endfor %}
       </div>
     </article>
+    <h2 class="title is-size-4" style="margin-bottom: 0.5em">Top Contributors</h2>
+    {% for user in top_users %}
+    <p class="is-size-5">{{user.score}} {{user}}</p>
+    {% endfor %}
   </div>
 </div>
 

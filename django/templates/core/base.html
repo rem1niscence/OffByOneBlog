@@ -39,12 +39,23 @@
 
       <div id="navbarItems" class="navbar-menu">
         <div class="navbar-end">
+          {% if user.is_authenticated %}
           <div class="navbar-item">
+            <div class="buttons">
+              <a class="button is-link" href="{% url 'qanda:ask-question' %}">Ask</a>
+              <a class="button" href="{% url 'logout' %}">Logout</a>
+            </div>
+          </div>
+            <a class="navbar-item">{{user}}</a>
+
+          {% else %}
+            <div class="navbar-item">
             <div class="buttons">
               <a class="button is-link" href="{% url 'register' %}">Register</a>
               <a class="button" href="{% url 'login' %}">Login</a>
             </div>
           </div>
+          {% endif %}
         </div>
       </div>
     </nav>
