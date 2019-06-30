@@ -159,7 +159,7 @@ class AnswerVote(Votable):
 
 class ProfileManager(models.Manager):
     # Score for an user is based on the sum of upvotes of all their answers.
-    def get_all_and_user_score(self):
+    def all_with_user_score(self):
         qs = self.get_queryset()
         qs = qs.annotate(score=Coalesce(
             Sum('user__answer__answervote__value'), 0))

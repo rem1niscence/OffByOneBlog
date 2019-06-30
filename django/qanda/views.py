@@ -213,7 +213,7 @@ class HomePageView(ListView):
         ctx = super(HomePageView, self).get_context_data(**kwargs)
         ctx['last_answers'] = Answer.objects.all_with_score() \
             .order_by('-created')[:5]
-        ctx['top_users'] = Profile.objects.get_all_and_user_score() \
+        ctx['top_users'] = Profile.objects.all_with_user_score() \
             .order_by('-score')[:5]
         return ctx
 
