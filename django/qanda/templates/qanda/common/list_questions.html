@@ -26,7 +26,7 @@
         <span class="tag is-dark is-small">{{tag.name}}</span>
         {% endfor %}
       </div>
-        <p class="has-text-grey-light">Asked {{question.created|timesince}} ago by <strong>{{question.user}}</strong></p>
+        <p class="has-text-grey-light">Asked {{question.created|timesince}} ago by <strong><a href="{% url 'qanda:user-detail' username=question.user.username %}">{{question.user}}</a></strong></p>
      </div>
     </div>
   </div>

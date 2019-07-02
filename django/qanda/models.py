@@ -125,10 +125,13 @@ class Answer(Publishable):
                     tmp.save()
             except Answer.DoesNotExist:
                 pass
-        super(Answer, self).save(*args, **kwargs)
+        super(Answer, self).save(*args,  **kwargs)
 
     class Meta:
         ordering = ["-accepted", ]
+
+    def __str__(self):
+        return f'{self.user} | {self.question.title}'
 
     def get_absolute_url(self):
         return reverse('qanda:question-detail', kwargs={

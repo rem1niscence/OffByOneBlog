@@ -268,3 +268,32 @@ def activate(request, uidb64, token):
         return redirect('qanda:home')
     else:
         return render(request, 'qanda/account_activation_invalid.html')
+
+
+class UserDetail(DetailView):
+    model = User()
+    slug_field = "username"
+    slug_url_kwarg = "username"
+    template_name = 'qanda/user_detail.html'
+
+    def get_context_data(self, **kwargs):
+        user = User().objects.get(username=self.kwargs['username'])
+        ctx = super(UserDetail, self).get_context_data(**kwargs)
+        tab = self.request.GET.get('sort', None)
+
+        ctx['answers'] = Answer.objects.all_with_score() \
+            .filter(user=user).order_by('-score')
+        ctx['questions'] = \
+            Question.objects.all_with_relations_and_score() \
+            .filter(user=user).order_by('-score')
+
+        # This is to emulate the common html that list all the questions
+        # TODO: Find a better way to refactor the common file
+        ctx['object_list'] = ctx['questions']
+
+        # User entered no tab query or invalid query
+        if (tab == 'None' or (tab != 'questions' or tab != 'answers')):
+            ctx['answers'] = ctx['answers'][:5]
+            ctx['questions'] = ctx['questions'][:5]
+
+        return ctx

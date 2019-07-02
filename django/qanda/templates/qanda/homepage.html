@@ -70,7 +70,7 @@
         {% for answer in last_answers %}
         <p class="is-size-6">{{answer.score}} <a class="has-text-info"
             href="{% url 'qanda:question-detail' pk=answer.question.id title=answer.question.title %}">{{ answer.question.title }}</a>
-          <span class="is-size-7"> by </span><strong class="is-size-7">{{answer.question.user}}</strong></p>
+          <span class="is-size-7"> by </span><strong class="is-size-7">{{answer.user}}</strong></p>
         <hr style="margin: 0.2em 0; height: 1px">
         {% endfor %}
       </div>

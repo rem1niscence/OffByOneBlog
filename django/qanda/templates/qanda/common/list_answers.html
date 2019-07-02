@@ -4,7 +4,7 @@
         <div class="columns" id="{% if answer.info.accepted %}accepted{% endif %}">
           <div class="column is-1">
             <p class="has-text-centered">{{ answer.info.score }}</p>
-            {% if user.is_authenticated %}
+            {% if user.is_authenticated and user != answer.info.user %}
             <form method="post" action="{{ answer.vote_url }}">
               {% csrf_token %}
               {{ answer.vote_form.as_p }}
@@ -33,7 +33,7 @@
             <br>
             <div class="answer-data" style="margin-top: 0.5em">
               <p class="has-text-right"><strong>Answered: </strong> {{ answer.info.created | timesince }} ago by
-                <strong>{{ answer.info.user }}</strong></p>
+                <strong><a href="{% url 'qanda:user-detail' username=answer.info.user.username %}">{{answer.info.user}}</a></strong></p>
             </div>
           </div>
         </div>

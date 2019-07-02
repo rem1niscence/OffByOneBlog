@@ -1,0 +1,74 @@
+{% extends 'core/base.html' %}
+
+{% block title %} {{user.username}} | {{block.super}}{% endblock title %}
+
+{% block body %}
+<div class="tabs">
+  <ul>
+    <li class="{% if not 'tab' in request.GET %} is-active {% endif %}"><a
+        href="{% url 'qanda:user-detail' username=user.username %}">Summary</a></li>
+    <li class="{% if 'tab' in request.GET and request.GET.tab == 'answers'%} is-active {% endif %}"><a
+        href="{% url 'qanda:user-detail' username=user.username %}?tab=answers">Answers</a></li>
+    <li class="{% if 'tab' in request.GET and request.GET.tab == 'questions'%} is-active {% endif %}"><a
+        href="{% url 'qanda:user-detail' username=user.username %}?tab=questions">Questions</a></li>
+  </ul>
+</div>
+
+<div class="columns">
+  <div class="column is-9">
+
+    {% if 'tab' in request.GET and request.GET.tab == 'answers' %}
+    <h2 class="title is-size-4">{{user.answer_set.all|length}} Answers</h2>
+    <hr>
+    {% for answer in answers  %}
+    <p class="subtitle" style="margin-left: 1.5em">{{answer.score}} <a
+        href="{% url 'qanda:question-detail' pk=answer.question.pk title=answer.question.title %}">{{answer.question.title}}</a>
+    </p>
+    {% endfor %}
+    {% elif 'tab' in request.GET and request.GET.tab == 'questions' %}
+    <h2 class="title is-size-4">{{user.question_set.all|length}} Questions</h2>
+    <hr>
+    {% include "qanda/common/list_questions.html" %}
+
+    {% else %}
+
+    <h1 class="title" style="margin-bottom: 1em">Top answers</h1>
+    {% for answer in answers %}
+    <p class="subtitle" style="margin-left: 1.5em">{{answer.score}} <a
+        href="{% url 'qanda:question-detail' pk=answer.question.pk title=answer.question.title %}">{{answer.question.title}}</a>
+    </p>
+    {% endfor %}
+
+    {% if answers|length > 5 %}
+    <p class="subtitle" style="margin-left: 1.5em"><a href="#">View more → </a></p>
+    {% endif %}
+    <br>
+
+    <h1 class="title" style="margin-bottom: 1em">Top Questions</h1>
+    {% for question in questions %}
+    <p class="subtitle" style="margin-left: 1.5em">{{question.score}} <a
+        href="{% url 'qanda:question-detail' pk=question.pk title=question.title %}">{{question.title}}</a>
+    </p>
+    {% endfor %}
+
+    {% if questions|length > 5 %}
+    <p class="subtitle" style="margin-left: 1.5em"><a href="#">View more → </a></p>
+    {% endif %}
+
+    {% endif %}
+
+  </div>
+  <div class="column is-3">
+    <div class="user-info">
+      <p class="subtitle is-size-4">{{user.first_name}} {{user.last_name}} ({{user}}) </p>
+      <h r>
+        <p class="subtitle is-size-6">{{user.answer_set.all|length}} answer{{user.answer_set.all|length|pluralize}}</p>
+        <p class="subtitle is-size-6">{{user.question_set.all|length}}
+          question{{user.question_set.all|length|pluralize}}</p>
+        <p class="subtitle is-size-6"><i class="fas fa-history"></i> Member for {{user.date_joined|timesince}}</p>
+        <p class="subtitle is-size-6"><i class="far fa-clock"></i> Last seen {{user.last_login|timesince}} ago</p>
+    </div>
+  </div>
+</div>
+
+{% endblock body %}

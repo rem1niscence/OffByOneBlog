@@ -40,13 +40,25 @@
       <div id="navbarItems" class="navbar-menu">
         <div class="navbar-end">
           {% if user.is_authenticated %}
+          <div class="navbar-item has-dropdown is-hoverable">
+        <a class="navbar-link">
+          {{user}}
+        </a>
+
+        <div class="navbar-dropdown">
+          <a class="navbar-item" href="{% url 'qanda:user-detail' username=user.username %}">
+            Profile
+          </a>
+          <a class="navbar-item" href="{% url 'logout' %}">
+            Logout
+          </a>
+        </div>
           <div class="navbar-item">
             <div class="buttons">
               <a class="button is-link" href="{% url 'qanda:ask-question' %}">Ask</a>
-              <a class="button" href="{% url 'logout' %}">Logout</a>
             </div>
           </div>
-            <a class="navbar-item">{{user}}</a>
+            
 
           {% else %}
             <div class="navbar-item">
