@@ -38,9 +38,8 @@
         href="{% url 'qanda:question-detail' pk=answer.question.pk title=answer.question.title %}">{{answer.question.title}}</a>
     </p>
     {% endfor %}
-
-    {% if answers|length > 5 %}
-    <p class="subtitle" style="margin-left: 1.5em"><a href="#">View more → </a></p>
+    {% if user.answer_set.all|length > 5 %}
+    <p class="subtitle" style="margin-left: 1.5em"><a href="{% url 'qanda:user-detail' username=user.username %}?tab=answers">View more → </a></p>
     {% endif %}
     <br>
 
@@ -50,9 +49,9 @@
         href="{% url 'qanda:question-detail' pk=question.pk title=question.title %}">{{question.title}}</a>
     </p>
     {% endfor %}
-
-    {% if questions|length > 5 %}
-    <p class="subtitle" style="margin-left: 1.5em"><a href="#">View more → </a></p>
+    
+    {% if user.question_set.all|length > 5 %}
+    <p class="subtitle" style="margin-left: 1.5em"><a href="{% url 'qanda:user-detail' username=user.username %}?tab=questions">View more → </a></p>
     {% endif %}
 
     {% endif %}

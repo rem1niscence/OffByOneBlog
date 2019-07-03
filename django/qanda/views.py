@@ -279,7 +279,7 @@ class UserDetail(DetailView):
     def get_context_data(self, **kwargs):
         user = User().objects.get(username=self.kwargs['username'])
         ctx = super(UserDetail, self).get_context_data(**kwargs)
-        tab = self.request.GET.get('sort', None)
+        tab = self.request.GET.get('tab', None)
 
         ctx['answers'] = Answer.objects.all_with_score() \
             .filter(user=user).order_by('-score')
@@ -291,8 +291,8 @@ class UserDetail(DetailView):
         # TODO: Find a better way to refactor the common file
         ctx['object_list'] = ctx['questions']
 
-        # User entered no tab query or invalid query
-        if (tab == 'None' or (tab != 'questions' or tab != 'answers')):
+        # User entered no tab query or invalid quer
+        if (tab == 'None' or (tab != 'questions' and tab != 'answers')):
             ctx['answers'] = ctx['answers'][:5]
             ctx['questions'] = ctx['questions'][:5]
 
