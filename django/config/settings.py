@@ -141,3 +141,7 @@ SENDGRID_API_KEY = os.getenv('SENDGRID_KEY')
 SENDGRID_SANDBOX_MODE_IN_DEBUG = False
 EMAIL_USE_TLS = True
 DEFAULT_FROM_EMAIL = 'OffByOne Q/A Team <noreply@offbyone.com>'
+
+ES_INDEX = 'offbyone'
+ES_HOST = 'elasticsearch'
+ES_PORT = '9200'

@@ -9,12 +9,14 @@ from django.template.loader import render_to_string
 from django.urls import reverse, reverse_lazy
 from django.utils.encoding import force_bytes, force_text
 from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
-from django.views.generic import CreateView, DetailView, ListView, UpdateView
+from django.views.generic import (CreateView, DetailView, ListView,
+                                  TemplateView, UpdateView)
 from qanda.forms import (AnswerAcceptanceForm, AnswerForm, AnswerVoteForm,
                          CustomUserCreationForm, QuestionForm,
                          QuestionVoteForm)
-from qanda.models import (Answer, AnswerVote, Question,
-                          QuestionVote, Tag, Profile)
+from qanda.models import (Answer, AnswerVote, Profile, Question, QuestionVote,
+                          Tag)
+from qanda.service.elasticsearch import search_for_questions
 from qanda.tokens import account_activation_token
 
 
@@ -215,6 +217,7 @@ class HomePageView(ListView):
             .order_by('-created')[:5]
         ctx['top_users'] = Profile.objects.all_with_user_score() \
             .order_by('-score')[:5]
+        ctx['questions'] = ctx['object_list']
         return ctx
 
     def get_queryset(self):
@@ -287,13 +290,22 @@ class UserDetail(DetailView):
             Question.objects.all_with_relations_and_score() \
             .filter(user=user).order_by('-score')
 
-        # This is to emulate the common html that list all the questions
-        # TODO: Find a better way to refactor the common file
-        ctx['object_list'] = ctx['questions']
-
         # User entered no tab query or invalid quer
         if (tab == 'None' or (tab != 'questions' and tab != 'answers')):
             ctx['answers'] = ctx['answers'][:5]
             ctx['questions'] = ctx['questions'][:5]
 
+        return ctx
+
+
+class SearchView(TemplateView):
+    template_name = 'qanda/search.html'
+
+    def get_context_data(self, **kwargs):
+        query = self.request.GET.get('q', None)
+        ctx = super().get_context_data(query=query, **kwargs)
+        if query:
+            results = search_for_questions(query)
+            ctx['questions'] = [Question.objects.all_with_answer_score().get(
+                id=hit['id']) for hit in results]
         return ctx

@@ -1,11 +1,13 @@
-from django.db import models
 from django.contrib.auth import get_user_model as User
-from django.utils import timezone
+from django.db import models
+from django.db.models import IntegerField, OuterRef, Subquery
 from django.db.models.aggregates import Sum
 from django.db.models.functions import Coalesce
-from django.shortcuts import reverse
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+from django.shortcuts import reverse
+from django.utils import timezone
+from qanda.service import elasticsearch
 
 
 class VoteManager(models.Manager):
@@ -23,18 +25,35 @@ class VoteManager(models.Manager):
 
 
 class QuestionManager(models.Manager):
-    def all_with_prefetch_tags(self):
-        return self.get_queryset().prefetch_related('tags')
+    def all_with_prefetch_tags(self, filter=None):
+        qs = self.get_queryset()
+        if filter:
+            qs = qs.filter(**filter)
+        return qs.prefetch_related('tags')
 
-    def all_with_relations_and_score(self):
+    def all_with_relations_and_score(self, filter=None):
         qs = self.all_with_prefetch_tags()
+        if filter:
+            qs = qs.filter(**filter)
         qs = qs.annotate(score=Coalesce(Sum('questionvote__value'), 0))
         return qs
 
-    def all_with_answer_score(self):
-        qs = self.all_with_relations_and_score()
-        qs = qs.annotate(ans_score=Coalesce(
-            Sum('answer__answervote__value'), 0))
+    def all_with_answer_score(self, filter=None):
+        score = self.get_queryset().annotate(
+            score=Coalesce(
+                Sum('questionvote__value'), 0)) \
+            .filter(pk=OuterRef('pk'))
+        ans_score = self.get_queryset().annotate(
+            ans_score=Coalesce(
+                Sum('answer__answervote__value'), 0)) \
+            .filter(pk=OuterRef('pk'))
+        qs = self.all_with_prefetch_tags()
+        if filter:
+            qs = qs.filter(**filter)
+        qs = qs.annotate(score=Subquery(score.values('score'),
+                                        output_field=IntegerField()),
+                         ans_score=Subquery(ans_score.values('ans_score'),
+                                            output_field=IntegerField()))
         return qs
 
 
@@ -94,8 +113,31 @@ class Question(Publishable):
     def can_accept_answers(self, user):
         return self.user == user
 
+    def question_text(self):
+        return f'{self.title} \n{self.body}'
+
     class Meta:
         ordering = ["-created", ]
+
+    def as_elastic_search_dict(self):
+        return {
+            '_id': self.id,
+            '_type': 'doc',
+            'text': f'{self.title}\n{self.body}',
+            'body': self.body,
+            'title': self.title,
+            'created': self.created,
+            'modified': self.modified,
+            'id': self.id,
+        }
+
+    # To update the elasticsearch server when the model change
+    def save(self, force_insert=False, force_update=False, using=None,
+             update_fields=None):
+        super().save(force_insert=force_insert,
+                     force_update=force_update, using=using,
+                     update_fields=update_fields)
+        elasticsearch.upsert(self)
 
 
 class Tag(models.Model):

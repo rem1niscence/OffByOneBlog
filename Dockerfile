@@ -4,7 +4,7 @@ ENV PYTHONUNBUFFERED 1
 ENV PYTHONDONTWRITEBYTECODE 1
 
 # Dependencies and scripts setup
-RUN apk add --update --no-cache postgresql-client nginx jpeg-dev zlib-dev
+RUN apk add --update --no-cache postgresql-client nginx curl jpeg-dev zlib-dev
 RUN apk add --update --no-cache --virtual .tmp-build-deps \
   gcc  libc-dev linux-headers postgresql-dev python3-dev 
 

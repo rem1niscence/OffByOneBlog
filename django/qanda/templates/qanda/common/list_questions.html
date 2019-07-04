@@ -1,5 +1,5 @@
 <div class="question">
-  {% for question in object_list %}
+  {% for question in questions %}
   <div class="columns" style="margin-bottom: 0;">
     <div class=" column is-2">
       <ul class="question-stats">
@@ -26,7 +26,7 @@
         <span class="tag is-dark is-small">{{tag.name}}</span>
         {% endfor %}
       </div>
-        <p class="has-text-grey-light">Asked {{question.created|timesince}} ago by <strong><a href="{% url 'qanda:user-detail' username=question.user.username %}">{{question.user}}</a></strong></p>
+        <p class="has-text-grey-light">Asked {{question.created|timesince}} ago by <strong><a href="{% url 'qanda:user-detail' username=question.user %}">{{question.user}}</a></strong></p>
      </div>
     </div>
   </div>

@@ -28,11 +28,19 @@
         </a>
       </div>
 
-      <div class="navbar-menu">
+      <div class="navbar-menu is-active">
         <div class="navbar-start">
           <div class="navbar-item">
-            <input class="input" id="search-box" type="text" placeholder="Search...">
-            <a id="search-button" href="#" class="button is-link">Search</a>
+            <form action="{% url 'qanda:question-search' %}" method="get">
+              <div class="field has-addons">
+                <div class="control">
+                  <input class="input" id="search-box" name="q" type="text" placeholder="Search">
+                </div>
+                <div class="control">
+                  <button class="button is-link" type="submit">Search</button>
+                </div>
+              </div>
+            </form>
           </div>
         </div>
       </div>
@@ -41,35 +49,35 @@
         <div class="navbar-end">
           {% if user.is_authenticated %}
           <div class="navbar-item has-dropdown is-hoverable">
-        <a class="navbar-link">
-          {{user}}
-        </a>
+            <a class="navbar-link">
+              {{user}}
+            </a>
 
-        <div class="navbar-dropdown">
-          <a class="navbar-item" href="{% url 'qanda:user-detail' username=user.username %}">
-            Profile
-          </a>
-          <a class="navbar-item" href="{% url 'logout' %}">
-            Logout
-          </a>
-        </div>
-          <div class="navbar-item">
-            <div class="buttons">
-              <a class="button is-link" href="{% url 'qanda:ask-question' %}">Ask</a>
+            <div class="navbar-dropdown">
+              <a class="navbar-item" href="{% url 'qanda:user-detail' username=user.username %}">
+                Profile
+              </a>
+              <a class="navbar-item" href="{% url 'logout' %}">
+                Logout
+              </a>
             </div>
-          </div>
-            
-
-          {% else %}
             <div class="navbar-item">
-            <div class="buttons">
-              <a class="button is-link" href="{% url 'register' %}">Register</a>
-              <a class="button" href="{% url 'login' %}">Login</a>
+              <div class="buttons">
+                <a class="button is-link" href="{% url 'qanda:ask-question' %}">Ask</a>
+              </div>
             </div>
+
+
+            {% else %}
+            <div class="navbar-item">
+              <div class="buttons">
+                <a class="button is-link" href="{% url 'register' %}">Register</a>
+                <a class="button" href="{% url 'login' %}">Login</a>
+              </div>
+            </div>
+            {% endif %}
           </div>
-          {% endif %}
         </div>
-      </div>
     </nav>
 
     <section class="section">

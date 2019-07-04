@@ -21,7 +21,7 @@ django-markup = "*"
 markdown = "*"
 bleach-whitelist = "*"
 django-sendgrid-v5 = "*"
-elasticsearch = "~=6.4.0"
+elasticsearch6 = "<7.0.0,>=6.0.0"
 
 [requires]
 python_version = "3.6"

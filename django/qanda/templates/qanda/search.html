@@ -1,0 +1,15 @@
+{% extends 'core/base.html' %}
+
+{% block title %} Post containing '{{query}}' | {{block.super}} {% endblock title %}
+
+{% block body %}
+  {% if query %}
+    {% if questions|length > 0 %}
+      <h1 class="title is-size-4">{{questions|length}} answers found</h1>
+      <hr>
+      {% include 'qanda/common/list_questions.html' %}
+    {% else %}
+      <p class="subtitle is-size-4 has-text-centered">No answers found, you could try with another search or <a class="is-link" href="{% url 'qanda:ask-question' %}">post a question</a>.</p>
+    {% endif %}
+  {% endif %}
+{% endblock body %}

@@ -7,6 +7,7 @@ services:
     container_name: off_web
     depends_on:
       - db
+      - elasticsearch
     restart: always
     ports:
       - 8000:8000

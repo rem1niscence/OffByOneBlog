@@ -21,7 +21,7 @@ urlpatterns = [
          name='update-accepted-answer'),
     re_path(r'^activate/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/$',
             views.activate, name='activate'),
-
     path('users/<str:username>/',
          views.UserDetail.as_view(), name='user-detail'),
+    path('q/search', views.SearchView.as_view(), name='question-search'),
 ]
