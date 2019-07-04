@@ -5,7 +5,7 @@
 {% block body %}
   {% if query %}
     {% if questions|length > 0 %}
-      <h1 class="title is-size-4">{{questions|length}} answers found</h1>
+      <h1 class="title is-size-4">{{questions|length}} result{{questions|pluralize}} found for '{{query}}'</h1>
       <hr>
       {% include 'qanda/common/list_questions.html' %}
     {% else %}

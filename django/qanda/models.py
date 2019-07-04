@@ -39,6 +39,8 @@ class QuestionManager(models.Manager):
         return qs
 
     def all_with_answer_score(self, filter=None):
+        # Have to resort to subqueries to avoid annotation bug, for more info
+        # check: https://code.djangoproject.com/ticket/10060
         score = self.get_queryset().annotate(
             score=Coalesce(
                 Sum('questionvote__value'), 0)) \
@@ -108,13 +110,16 @@ class Question(Publishable):
 
     def get_absolute_url(self):
         return reverse('qanda:question-detail', kwargs={
-            'pk': self.pk, 'title': self.title.replace(' ', '-')})
+            'pk': self.pk, 'title': self.title_as_hyphen})
 
     def can_accept_answers(self, user):
         return self.user == user
 
     def question_text(self):
         return f'{self.title} \n{self.body}'
+
+    def title_as_hyphen(self):
+        return self.title.replace(' ', '-')
 
     class Meta:
         ordering = ["-created", ]
@@ -131,7 +136,7 @@ class Question(Publishable):
             'id': self.id,
         }
 
-    # To update the elasticsearch server when the model change
+    # Update the elasticsearch server when the model change
     def save(self, force_insert=False, force_update=False, using=None,
              update_fields=None):
         super().save(force_insert=force_insert,
@@ -178,7 +183,7 @@ class Answer(Publishable):
     def get_absolute_url(self):
         return reverse('qanda:question-detail', kwargs={
             'pk': self.question.pk, 'title':
-            self.question.title.replace(' ', '-')})
+            self.question.title_as_hyphen})
 
 
 class Comment(Publishable):
