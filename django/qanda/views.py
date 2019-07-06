@@ -18,6 +18,7 @@ from qanda.models import (Answer, AnswerVote, Profile, Question, QuestionVote,
                           Tag)
 from qanda.service.elasticsearch import search_for_questions
 from qanda.tokens import account_activation_token
+from qanda.mixins import CacheVaryOnCookieMixin
 
 
 class CreateQuestion(LoginRequiredMixin, CreateView):
@@ -55,7 +56,7 @@ class CreateQuestion(LoginRequiredMixin, CreateView):
         return HttpResponseBadRequest()
 
 
-class QuestionDetail(DetailView):
+class QuestionDetail(CacheVaryOnCookieMixin, DetailView):
     queryset = Question.objects.all_with_relations_and_score()
 
     def get_vote_data(self, model, obj, url_id, create_url, update_url):
@@ -206,14 +207,15 @@ class UpdateAnswerAcceptanceView(LoginRequiredMixin, UpdateView):
         return self.object.question.get_absolute_url()
 
 
-class HomePageView(ListView):
+class HomePageView(CacheVaryOnCookieMixin, ListView):
     template_name = 'qanda/homepage.html'
     model = Question
     paginate_by = 10
+    timeout = 60*2
 
     def get_context_data(self, **kwargs):
         ctx = super(HomePageView, self).get_context_data(**kwargs)
-        ctx['last_answers'] = Answer.objects.all_with_score() \
+        ctx['last_answers'] = Answer.objects.all() \
             .order_by('-created')[:5]
         ctx['top_users'] = Profile.objects.all_with_user_score() \
             .order_by('-score')[:5]
@@ -222,14 +224,11 @@ class HomePageView(ListView):
 
     def get_queryset(self):
         sort_by = self.request.GET.get('sort', None)
-        if (sort_by == 'newest'):
-            qs = Question.objects.all_with_relations_and_score()
-        elif (sort_by == 'answered'):
-            qs = Question.objects.all_with_answer_score() \
-                .order_by('-ans_score')
-        else:
-            qs = Question.objects.all_with_relations_and_score() \
-                .order_by("-score")
+        qs = Question.objects.all_with_answer_score()
+        if (sort_by == 'answered'):
+            qs = qs.order_by('-ans_score')
+        elif (sort_by != 'newest'):
+            qs = qs.order_by("-score")
         return qs
 
 
@@ -273,7 +272,7 @@ def activate(request, uidb64, token):
         return render(request, 'qanda/account_activation_invalid.html')
 
 
-class UserDetail(DetailView):
+class UserDetail(CacheVaryOnCookieMixin, DetailView):
     model = User()
     slug_field = "username"
     slug_url_kwarg = "username"
@@ -306,6 +305,7 @@ class SearchView(TemplateView):
         ctx = super().get_context_data(query=query, **kwargs)
         if query:
             results = search_for_questions(query)
-            ctx['questions'] = [Question.objects.all_with_answer_score().get(
-                id=hit['id']) for hit in results]
+            ctx['questions'] = [
+                Question.objects.all_with_answer_score().get(
+                    id=hit['id']) for hit in results]
         return ctx

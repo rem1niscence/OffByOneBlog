@@ -23,7 +23,6 @@ services:
       - SENDGRID_KEY
     volumes:
       - ./django:/off_by_one/django
-      # - static_volume:/off_by_one/django/static_files
     command: >
       sh -c "./manage.py runserver 0.0.0.0:8000"
   db:
@@ -48,8 +47,10 @@ services:
       - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
     volumes:
       - es_data:/usr/share/elasticsearch/data
+  redis:
+    container_name: off_redis
+    image: redis:5.0.5-alpine
 
 volumes:
   postgres_data:
   es_data:
-  # static_volume:

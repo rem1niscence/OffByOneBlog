@@ -4,21 +4,7 @@ from django.contrib.auth.forms import (AuthenticationForm, UserCreationForm,
                                        UsernameField)
 from django.utils.translation import gettext_lazy as _
 from qanda.models import Answer, AnswerVote, Question, QuestionVote
-
-
-class ColorizedErrorFormMixin(forms.ModelForm):
-    error_css_class = 'is-danger'
-
-    def is_valid(self):
-        valid = super(ColorizedErrorFormMixin, self).is_valid()
-        self.add_error_css_class()
-        return valid
-
-    def add_error_css_class(self):
-        for field in self.errors:
-            self.fields[field].widget.attrs.update(
-                {'class': self.fields[field].widget.attrs.get('class', '') +
-                 f' {self.error_css_class}'})
+from qanda.mixins import ColorizedErrorFormMixin
 
 
 class QuestionForm(ColorizedErrorFormMixin, forms.ModelForm):
