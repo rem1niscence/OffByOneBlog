@@ -23,6 +23,7 @@ django-sendgrid-v5 = "*"
 elasticsearch6 = "<7.0.0,>=6.0.0"
 django-debug-toolbar = "<=3.0.0,>=2.0.0"
 django-redis = "*"
+celery = "==4.3.0"
 
 [requires]
 python_version = "3.6"

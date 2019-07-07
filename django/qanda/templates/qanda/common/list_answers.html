@@ -16,14 +16,14 @@
             {{ answer.info.body|apply_markup:"markdown" | linebreaks}}
             {% if answer.info.accepted and reject_form %}
             <br>
-            <form method="post" action="{% url "qanda:update-accepted-answer" pk=answer.info.pk %}">
+            <form method="post" action="{% url "qanda:update_accepted_answer" pk=answer.info.pk %}">
               {% csrf_token %}
               {{reject_form}}
               <input class="button is-danger is-pulled-right" type="submit" value="Reject answer">
             </form>
             {% elif accept_form %}
             <br>
-            <form method="post" action="{% url "qanda:update-accepted-answer" pk=answer.info.pk %}">
+            <form method="post" action="{% url "qanda:update_accepted_answer" pk=answer.info.pk %}">
               {% csrf_token %}
               {{accept_form}}
               <input class="button is-link is-pulled-right" type="submit" value="Accept answer">

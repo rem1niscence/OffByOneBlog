@@ -31,7 +31,7 @@
       <div class="navbar-menu is-active">
         <div class="navbar-start">
           <div class="navbar-item">
-            <form action="{% url 'qanda:question-search' %}" method="get">
+            <form action="{% url 'qanda:question_search' %}" method="get">
               <div class="field has-addons">
                 <div class="control">
                   <input class="input" id="search-box" name="q" type="text" placeholder="Search" required>
@@ -63,7 +63,7 @@
             </div>
             <div class="navbar-item">
               <div class="buttons">
-                <a class="button is-link" href="{% url 'qanda:ask-question' %}">Ask</a>
+                <a class="button is-link" href="{% url 'qanda:ask_question' %}">Ask</a>
               </div>
             </div>
 

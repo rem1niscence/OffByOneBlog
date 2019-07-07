@@ -9,7 +9,7 @@
       <hr>
       {% include 'qanda/common/list_questions.html' %}
     {% else %}
-      <p class="subtitle is-size-4 has-text-centered">No answers found, you could try with another search or <a class="is-link" href="{% url 'qanda:ask-question' %}">post a question</a>.</p>
+      <p class="subtitle is-size-4 has-text-centered">No answers found, you could try with another search or <a class="is-link" href="{% url 'qanda:ask_question' %}">post a question</a>.</p>
     {% endif %}
   {% endif %}
 {% endblock body %}

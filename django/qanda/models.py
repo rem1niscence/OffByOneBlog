@@ -109,8 +109,8 @@ class Question(Publishable):
         return f'{self.user} | {self.title}'
 
     def get_absolute_url(self):
-        return reverse('qanda:question-detail', kwargs={
-            'pk': self.pk, 'title': self.title_as_hyphen})
+        return reverse('qanda:question_detail', kwargs={
+            'pk': self.pk, 'title': self.title_as_hyphen()})
 
     def can_accept_answers(self, user):
         return self.user == user
@@ -181,9 +181,9 @@ class Answer(Publishable):
         return f'{self.user} | {self.question.title}'
 
     def get_absolute_url(self):
-        return reverse('qanda:question-detail', kwargs={
+        return reverse('qanda:question_detail', kwargs={
             'pk': self.question.pk, 'title':
-            self.question.title_as_hyphen})
+            self.question.title_as_hyphen()})
 
 
 class Comment(Publishable):

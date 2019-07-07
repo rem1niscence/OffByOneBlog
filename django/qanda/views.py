@@ -56,7 +56,7 @@ class CreateQuestion(LoginRequiredMixin, CreateView):
         return HttpResponseBadRequest()
 
 
-class QuestionDetail(CacheVaryOnCookieMixin, DetailView):
+class QuestionDetail(DetailView):
     queryset = Question.objects.all_with_relations_and_score()
 
     def get_vote_data(self, model, obj, url_id, create_url, update_url):
@@ -94,8 +94,8 @@ class QuestionDetail(CacheVaryOnCookieMixin, DetailView):
         if self.request.user.is_authenticated:
             vote_data = self.get_vote_data(
                 QuestionVote, self.object, 'question_id',
-                'qanda:question-vote-create',
-                'qanda:question-vote-update')
+                'qanda:question_vote_create',
+                'qanda:question_vote_update')
             vote_form = QuestionVoteForm(instance=vote_data['instance'])
             ctx['vote_form'] = vote_form
             ctx['vote_form_url'] = vote_data['url']
@@ -104,8 +104,8 @@ class QuestionDetail(CacheVaryOnCookieMixin, DetailView):
             for ans in answers:
                 answer_dict = {}
                 ans_vote_data = self.get_vote_data(
-                    AnswerVote, ans, 'answer_id', 'qanda:answer-vote-create',
-                    'qanda:answer-vote-update')
+                    AnswerVote, ans, 'answer_id', 'qanda:answer_vote_create',
+                    'qanda:answer_vote_update')
 
                 answer_dict['vote_form'] = AnswerVoteForm(
                     instance=ans_vote_data['instance'])
@@ -176,7 +176,7 @@ class AnswerVoteCreate(LoginRequiredMixin, CreateView):
         }
 
     def get_success_url(self):
-        return self.object.answer.question.get_absolute_url()
+        return self.object.answer.get_absolute_url()
 
     def render_to_response(self, context, **response_kwargs):
         return redirect(to=self.get_success_url())
@@ -193,7 +193,7 @@ class AnswerVoteUpdate(LoginRequiredMixin, UpdateView):
         return vote
 
     def get_success_url(self):
-        return self.object.answer.question.get_absolute_url()
+        return self.object.answer.get_absolute_url()
 
     def render_to_response(self, context, **response_kwargs):
         return redirect(to=self.get_success_url())
@@ -297,8 +297,9 @@ class UserDetail(CacheVaryOnCookieMixin, DetailView):
         return ctx
 
 
-class SearchView(TemplateView):
+class SearchView(CacheVaryOnCookieMixin, TemplateView):
     template_name = 'qanda/search.html'
+    timeout = 60*20
 
     def get_context_data(self, **kwargs):
         query = self.request.GET.get('q', None)

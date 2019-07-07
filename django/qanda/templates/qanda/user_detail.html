@@ -22,7 +22,7 @@
     <hr>
     {% for answer in answers  %}
     <p class="subtitle" style="margin-left: 1.5em">{{answer.score}} <a
-        href="{% url 'qanda:question-detail' pk=answer.question.pk title=answer.question.title %}">{{answer.question.title}}</a>
+        href="{% url 'qanda:question_detail' pk=answer.question.pk title=answer.question.title %}">{{answer.question.title}}</a>
     </p>
     {% endfor %}
     {% elif 'tab' in request.GET and request.GET.tab == 'questions' %}
@@ -35,7 +35,7 @@
     <h1 class="title" style="margin-bottom: 1em">Top answers</h1>
     {% for answer in answers %}
     <p class="subtitle" style="margin-left: 1.5em">{{answer.score}} <a
-        href="{% url 'qanda:question-detail' pk=answer.question.pk title=answer.question.title %}">{{answer.question.title}}</a>
+        href="{% url 'qanda:question_detail' pk=answer.question.pk title=answer.question.title %}">{{answer.question.title}}</a>
     </p>
     {% endfor %}
     {% if user.answer_set.all|length > 5 %}
@@ -46,7 +46,7 @@
     <h1 class="title" style="margin-bottom: 1em">Top Questions</h1>
     {% for question in questions %}
     <p class="subtitle" style="margin-left: 1.5em">{{question.score}} <a
-        href="{% url 'qanda:question-detail' pk=question.pk title=question.title %}">{{question.title}}</a>
+        href="{% url 'qanda:question_detail' pk=question.pk title=question.title %}">{{question.title}}</a>
     </p>
     {% endfor %}
     
