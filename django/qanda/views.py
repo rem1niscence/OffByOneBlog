@@ -9,16 +9,16 @@ from django.template.loader import render_to_string
 from django.urls import reverse, reverse_lazy
 from django.utils.encoding import force_bytes, force_text
 from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
-from django.views.generic import (CreateView, DetailView, ListView,
+from django.views.generic import (CreateView, DeleteView, DetailView, ListView,
                                   TemplateView, UpdateView)
 from qanda.forms import (AnswerAcceptanceForm, AnswerForm, AnswerVoteForm,
                          CustomUserCreationForm, QuestionForm,
-                         QuestionVoteForm)
+                         QuestionVoteForm, QuestionSubscriptionForm)
+from qanda.mixins import CacheVaryOnCookieMixin
 from qanda.models import (Answer, AnswerVote, Profile, Question, QuestionVote,
-                          Tag)
+                          Tag, QuestionSubscription)
 from qanda.service.elasticsearch import search_for_questions
 from qanda.tokens import account_activation_token
-from qanda.mixins import CacheVaryOnCookieMixin
 
 
 class CreateQuestion(LoginRequiredMixin, CreateView):
@@ -92,6 +92,12 @@ class QuestionDetail(DetailView):
                 AnswerAcceptanceForm(initial={'accepted': False})
 
         if self.request.user.is_authenticated:
+            if (QuestionSubscription.objects.is_subscribed(
+                    user=self.request.user, question=self.object)):
+                ctx['subscribed'] = True
+            else:
+                ctx['subscribed'] = False
+
             vote_data = self.get_vote_data(
                 QuestionVote, self.object, 'question_id',
                 'qanda:question_vote_create',
@@ -310,3 +316,35 @@ class SearchView(CacheVaryOnCookieMixin, TemplateView):
                 Question.objects.all_with_answer_score().get(
                     id=hit['id']) for hit in results]
         return ctx
+
+
+class QuestionSubscriptionCreate(CreateView):
+    form_class = QuestionSubscriptionForm
+
+    def get_initial(self):
+        return {
+            'user': self.request.user.id,
+            'question': self.kwargs['pk']
+        }
+
+    def get_success_url(self):
+        return self.object.question.get_absolute_url()
+
+
+class QuestionSubscriptionDelete(DeleteView):
+    form_class = QuestionSubscriptionForm
+
+    queryset = QuestionSubscription.objects.all()
+
+    def get_object(self):
+        return self.queryset.get(
+            user=self.request.user.id, question=self.kwargs['pk'])
+
+    def get_initial(self):
+        return {
+            'user': self.request.user.id,
+            'question': self.kwargs['pk']
+        }
+
+    def get_success_url(self):
+        return self.object.question.get_absolute_url()

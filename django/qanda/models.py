@@ -231,3 +231,21 @@ class Profile(models.Model):
         if created:
             Profile.objects.create(user=instance)
         instance.profile.save()
+
+
+class QuestionSubscriptionManager(models.Manager):
+    def is_subscribed(self, user, question):
+        return self.model.objects.filter(user=user, question=question).exists()
+
+
+class QuestionSubscription(models.Model):
+    user = models.ForeignKey(User(), on_delete=models.CASCADE)
+    question = models.ForeignKey(Question, on_delete=models.CASCADE)
+
+    objects = QuestionSubscriptionManager()
+
+    def __str__(self):
+        return f'{self.user} | {self.question.title}'
+
+    class Meta:
+        unique_together = ('user', 'question')

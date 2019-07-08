@@ -37,7 +37,8 @@
   <div class="column is-3">
     <p><strong>Asked: </strong>{{question.created | timesince}} ago</p>
     <p><strong>Viewed: </strong>{{question.viewed}} time{{question.viewed|pluralize}}</p>
-    <p><strong>By: </strong><a href="{% url 'qanda:user-detail' username=question.user.username%}">{{question.user}}</a></p>
+    <p><strong>By: </strong><a href="{% url 'qanda:user-detail' username=question.user.username%}">{{question.user}}</a>
+    </p>
     <br>
     <article class="message">
       <div class="message-header">
@@ -51,6 +52,19 @@
         dui urna, vehicula et sem eget, facilisis sodales sem.
       </div>
     </article>
+    {% if user.is_authenticated %}
+    <form action="{% if subscribed %}
+      {% url 'qanda:question_subscription_delete' pk=question.pk %}
+    {% else %}
+      {% url 'qanda:question_subscription_create' pk=question.pk %}
+    {% endif %}" method="post">
+      {% csrf_token %}
+      <input type="checkbox" name="subscribe" onChange="this.form.submit()" {% if subscribed %}checked{% endif %}>
+      <label for="subscribe" class="tooltip"
+        data-tooltip="You will receive email updates whenever a new answer is posted">Subscribe to question <i
+          class="fas fa-question-circle"></i></label>
+    </form>
+    {% endif %}
   </div>
 </div>
 

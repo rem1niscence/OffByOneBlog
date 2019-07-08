@@ -3,7 +3,8 @@ from django.contrib.auth import get_user_model, password_validation
 from django.contrib.auth.forms import (AuthenticationForm, UserCreationForm,
                                        UsernameField)
 from django.utils.translation import gettext_lazy as _
-from qanda.models import Answer, AnswerVote, Question, QuestionVote
+from qanda.models import (Answer, AnswerVote, Question,
+                          QuestionVote, QuestionSubscription)
 from qanda.mixins import ColorizedErrorFormMixin
 
 
@@ -177,3 +178,21 @@ class CustomUserCreationForm(ColorizedErrorFormMixin, UserCreationForm):
         model = get_user_model()
         fields = ('first_name', 'last_name', 'email',
                   'username', 'password1', 'password2')
+
+
+class QuestionSubscriptionForm(forms.ModelForm):
+    user = forms.ModelChoiceField(
+        widget=forms.HiddenInput,
+        queryset=get_user_model().objects.all(),
+        disabled=True
+    )
+
+    question = forms.ModelChoiceField(
+        widget=forms.HiddenInput,
+        queryset=Question.objects.all(),
+        disabled=True
+    )
+
+    class Meta:
+        model = QuestionSubscription
+        fields = ('user', 'question')

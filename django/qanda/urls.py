@@ -24,4 +24,10 @@ urlpatterns = [
     path('users/<str:username>/',
          views.UserDetail.as_view(), name='user-detail'),
     path('q/search', views.SearchView.as_view(), name='question_search'),
+    path('question/<int:pk>/subscribe',
+         views.QuestionSubscriptionCreate.as_view(),
+         name='question_subscription_create'),
+    path('question/<int:pk>/subscribe/delete',
+         views.QuestionSubscriptionDelete.as_view(),
+         name='question_subscription_delete'),
 ]
