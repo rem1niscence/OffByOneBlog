@@ -112,7 +112,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'America/Santo_Domingo'
 
 USE_I18N = True
 
@@ -143,11 +143,12 @@ SENDGRID_API_KEY = os.getenv('SENDGRID_KEY')
 SENDGRID_SANDBOX_MODE_IN_DEBUG = False
 EMAIL_USE_TLS = True
 DEFAULT_FROM_EMAIL = 'OffByOne Q/A Team <noreply@offbyone.com>'
+EMAIL_HOST = 'http://localhost:8000'
 
+# ElasticSearch config
 ES_INDEX = 'offbyone'
 ES_HOST = 'elasticsearch'
 ES_PORT = '9200'
-
 
 CACHES = {
     "default": {
@@ -159,17 +160,25 @@ CACHES = {
         "KEY_PREFIX": "cache"
     }
 }
+
+# Celery config
+CELERY_BROKER_URL = 'redis://redis:6379/0'
+CELERY_RESULT_BACKEND = 'redis://redis:6379/0'
+CELERY_ACCEPT_CONTENT = ['application/json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TIMEZONE = 'America/Santo_Domingo'
+
+
 # Default Cache time to live is 15 minutes.
 CACHE_TTL = 60 * 15
 
 # Debug toolbar config
 INTERNAL_IPS = ['127.0.0.1', ]
 
+# def show_toolbar(request):
+#     return DEBUG
 
-def show_toolbar(request):
-    return DEBUG
-
-
-DEBUG_TOOLBAR_CONFIG = {
-    "SHOW_TOOLBAR_CALLBACK": show_toolbar,
-}
+# DEBUG_TOOLBAR_CONFIG = {
+#     "SHOW_TOOLBAR_CALLBACK": show_toolbar,
+# }

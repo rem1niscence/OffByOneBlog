@@ -2,8 +2,7 @@ version: "3.3"
 
 services:
   web:
-    build:
-      context: .
+    build: .
     container_name: off_web
     depends_on:
       - db
@@ -50,6 +49,23 @@ services:
   redis:
     container_name: off_redis
     image: redis:5.0.5-alpine
+  celery:
+    build: .
+    container_name: off_celery
+    command: >
+      sh -c "celery -A config.celery worker -l info"
+    depends_on:
+      - web
+    environment:
+      - DJANGO_SECRET_KEY
+      - DJANGO_DB_NAME
+      - DJANGO_DB_USER
+      - DJANGO_DB_PASSWORD
+      - DJANGO_DB_HOST
+      - DJANGO_DB_PORT
+      - DJANGO_EMAIL_HOST
+      - DJANGO_EMAIL_HOST_USER
+      - SENDGRID_KEY
 
 volumes:
   postgres_data:

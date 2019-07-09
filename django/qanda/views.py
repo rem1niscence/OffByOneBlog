@@ -318,7 +318,7 @@ class SearchView(CacheVaryOnCookieMixin, TemplateView):
         return ctx
 
 
-class QuestionSubscriptionCreate(CreateView):
+class QuestionSubscriptionCreate(LoginRequiredMixin, CreateView):
     form_class = QuestionSubscriptionForm
 
     def get_initial(self):
@@ -331,7 +331,7 @@ class QuestionSubscriptionCreate(CreateView):
         return self.object.question.get_absolute_url()
 
 
-class QuestionSubscriptionDelete(DeleteView):
+class QuestionSubscriptionDelete(LoginRequiredMixin, DeleteView):
     form_class = QuestionSubscriptionForm
 
     queryset = QuestionSubscription.objects.all()

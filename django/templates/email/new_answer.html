@@ -1,0 +1,9 @@
+{% autoescape off %}
+Hi {{ user.username }},
+
+A new answer has been posted on the question '{{ question.title }}'
+
+you can come check it out at {{ domain }}{% url 'qanda:question_detail' pk=question.pk title=question.title_as_hyphen %}
+
+You're receiving this because you're subscribed to the question. If you no longer want to receive this emails, please click on this link {{ domain }}{% url 'qanda:question_subscription_delete' pk=question.pk %}
+{% endautoescape %}

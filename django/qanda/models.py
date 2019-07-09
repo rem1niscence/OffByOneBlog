@@ -8,6 +8,9 @@ from django.dispatch import receiver
 from django.shortcuts import reverse
 from django.utils import timezone
 from qanda.service import elasticsearch
+from django.conf import settings
+from django.template.loader import render_to_string
+from qanda import tasks
 
 
 class VoteManager(models.Manager):
@@ -161,7 +164,8 @@ class Answer(Publishable):
 
     objects = AnswerManager()
 
-    def save(self, *args, **kwargs):
+    def save(self, force_insert=False, force_update=False, using=None,
+             update_fields=None):
         # There can only be one accepted answer per question
         if self.accepted:
             try:
@@ -172,7 +176,14 @@ class Answer(Publishable):
                     tmp.save()
             except Answer.DoesNotExist:
                 pass
-        super(Answer, self).save(*args,  **kwargs)
+        is_new = self._state.adding or force_insert
+        super().save(force_insert=force_insert, force_update=force_update,
+                     using=using, update_fields=update_fields)
+        if is_new:
+            self.send_answer_email()
+
+    def send_answer_email(self):
+        tasks.build_new_answer_email.delay(self.question.id)
 
     class Meta:
         ordering = ["-accepted", ]
@@ -243,6 +254,17 @@ class QuestionSubscription(models.Model):
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
 
     objects = QuestionSubscriptionManager()
+
+    ANSWER_EMAIL_TEMPLATE = 'email/new_answer.html'
+
+    def email_new_answer(self):
+        subject = f"New answer on '{self.question.title}'"
+        message = render_to_string(self.ANSWER_EMAIL_TEMPLATE, {
+            'domain': settings.EMAIL_HOST,
+            'user': self.user,
+            'question': self.question
+        })
+        tasks.send_email.delay(self.user.id, subject, message)
 
     def __str__(self):
         return f'{self.user} | {self.question.title}'
